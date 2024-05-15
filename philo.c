@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 13:24:40 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/14 17:27:41 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/15 18:34:15 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,22 +52,22 @@ int	check_arguments(int argc, char **argv)
 
 void	*routine()
 {
-	printf("Philosopher created\n");	
+	printf("Philosopher #[%ld] created\n", pthread_self());	
 }
 
 int	main(int argc, char **argv)
 {
 	int		nb_philo;
-	t_philo	**philos;
+	t_philo	*philos;
 	int		i;
 
 	if (check_arguments(argc, argv))
 		return (1);
 	nb_philo = ft_atoi(argv[1]);
-	philos = malloc(sizeof(t_philo *) * (nb_philo + 1));
+	philos = malloc(sizeof(t_philo) * (nb_philo + 1));
 	if (!philos)
 		return (1);
-	i = 0;
+/*	i = 0;
 	while (i < nb_philo)
 	{
 		philos[i] = malloc(sizeof(t_philo));
@@ -78,20 +78,20 @@ int	main(int argc, char **argv)
 			return (free (philos), 1);
 		}
 		i++;
-	}
+	}*/
 	i = 0;
 	while (i < nb_philo)
 	{
-		philos[i]->num = i + 1;
-		pthread_create(&(*philos)[i].tid, NULL, &routine, NULL);
+		philos[i].num = i + 1;
+		pthread_create(&philos[i].tid, NULL, &routine, NULL);
 		i++;
 	}
-	philos[i] = NULL;
+	philos[i].num = -1;
 	i = 0;
 	while (i < nb_philo)
 	{
-		pthread_join(philos[i]->tid, NULL);
-		printf("Philosopher joined\n");
+		pthread_join(philos[i].tid, NULL);
+		printf("Philosopher num %d [%ld] joined\n", philos[i].num, philos[i].tid);
 		i++;
 	}
 	return (0);
