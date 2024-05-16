@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_test.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 10:15:05 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/16 16:45:06 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/17 00:40:59 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,22 @@ typedef struct s_philo
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				time_to_die;
-}				t_philo;			
+}				t_philo;
 
 typedef struct s_rules
 {
-	int	nb_philo;
-	int	time_to_eat;
-	int	time_to_sleep;
-	int	time_to_die;
+	int				nb_philo;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				time_to_die;
+	struct timeval	tv_beg;
 }				t_rules;
+
+typedef struct s_args
+{
+	t_philo	*philo;
+	t_rules *rules;
+}				t_args;
 
 void	timestamp(t_philo philo)
 {
@@ -45,9 +52,12 @@ void	timestamp(t_philo philo)
 		printf("timestamp_in_ms %d has taken a fork", philo.id);
 }
 
-void	*eat(void *phi)
+void	*eat(void *args)
 {
-	t_philo	*philo = (t_philo *)phi; 
+	t_philo	*philo = ((t_args *)args)->philo;
+	t_rules	*rules = ((t_args *)args)->rules;
+	printf("OK Philo %d...It began at %ld\n", philo->id, rules->tv_beg.tv_sec);
+	sleep(2);
 	while (1)
 	{
 		if (philo->id % 2 == 0)
@@ -55,7 +65,7 @@ void	*eat(void *phi)
 			pthread_mutex_lock(&(philo->l_fork));
 			pthread_mutex_lock(philo->r_fork);
 		}
-		else	
+		else
 		{
 			pthread_mutex_lock(philo->r_fork);
 			pthread_mutex_lock(&(philo->l_fork));
@@ -63,11 +73,11 @@ void	*eat(void *phi)
 		philo->state == 1;
 		timestamp(*philo);
 //		printf("Philo's [%d] eating\n", philo->id);
-		usleep(philo->time_to_sleep * 1000);	
+		usleep(philo->time_to_sleep * 1000);
 		pthread_mutex_unlock(&(philo->l_fork));
 		pthread_mutex_unlock(philo->r_fork);
 		printf("Philo's [%d] sleeping\n", philo->id);
-		usleep(philo->time_to_sleep * 1000);	
+		usleep(philo->time_to_sleep * 1000);
 		printf("Philo's [%d] thinking\n", philo->id);
 	}
 }
@@ -76,8 +86,18 @@ int	main()
 {
 	int		nb_philo = 4;
 	t_philo	philos[nb_philo];
+	t_rules	rules;
+	t_args	*args;
 	int		i = 0;
+
 	// Creer tableau de philo
+	// Remplir les rules
+	rules.nb_philo = nb_philo;
+	rules.time_to_die = 100;
+	rules.time_to_eat = 100;
+	rules.time_to_sleep = 100;
+	if (gettimeofday(&(rules.tv_beg), NULL))
+		return (1);
 	// Remplir ces caracteristiques
 	while (i < nb_philo)
 	{
@@ -87,9 +107,8 @@ int	main()
 			philos[i].r_fork = &philos[0].l_fork;
 		else
 			philos[i].r_fork = &philos[i + 1].l_fork;
-		philos[i].time_to_eat = 100;
-		philos[i].time_to_sleep = 1000;
-		philos[i].time_to_die = 100;
+//		if (!i)
+//			error = philos[i].tv_beg
 		i++;
 	}
 	// Envoyer programme
@@ -98,7 +117,9 @@ int	main()
 	{
 		if (philos[i].id % 2 == 1 )
 			usleep(100);
-		pthread_create(&(philos[i].t_id), NULL, &eat, (void *)&philos[i]);
+		args->philo = &philos[i];
+		args->rules = &rules;
+		pthread_create(&(philos[i].t_id), NULL, &eat, (void *)args);
 		i++;
 	}
 	// thread_join
@@ -107,7 +128,7 @@ int	main()
 	{
 		pthread_join(philos[i].t_id, NULL);
 		i++;
-	}	
+	}
 	// Destroy mutex
 	i = 0;
 	while (i < nb_philo)
