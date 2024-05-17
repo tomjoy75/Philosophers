@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 10:15:05 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/17 15:38:10 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/17 16:29:52 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,9 @@ int	timestamp(t_philo philo, t_rules rules, int state)
 		printf("%d\t%d is thinking\n", time_passed, philo.id);
 	if (state == 5)
 		printf("%d\t%d died\n", time_passed, philo.id);
+	if (state == 6)
+		printf("%d\t%d ___check dying___\n", time_passed, philo.id);
+	return (0);	
 }
 
 void	*eat(void *args)
@@ -102,6 +105,18 @@ void	*eat(void *args)
 		usleep(100);
 //		printf("Philo's [%d] thinking\n", philo->id);
 	}
+}
+
+void	*dead(void *args) 	
+{
+	t_philo	*philo = ((t_args *)args)->philo;
+	t_rules	*rules = ((t_args *)args)->rules;
+	while (1)
+	{
+		usleep(rules->time_to_die * 1000);	
+		timestamp(*philo, *rules, 6);
+//		printf("Check dying philo %d\n", philo->id);
+	}	
 }
 
 int	main()
@@ -143,6 +158,7 @@ int	main()
 		args[i].philo = &(philos[i]);
 		args[i].rules = &rules;
 		pthread_create(&(philos[i].t_id), NULL, &eat, (void *)&args[i]);
+		pthread_create(&(philos[i].t_id), NULL, &dead, (void *)&args[i]);
 		i++;
 	}
 	// thread_join
