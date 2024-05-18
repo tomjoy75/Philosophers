@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_test.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 10:15:05 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/17 16:29:52 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/18 01:18:57 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,9 @@ typedef struct s_philo
 	int				id;
 	pthread_t		t_id;
 	pthread_mutex_t	l_fork;
+	int				l_locked;
 	pthread_mutex_t	*r_fork;
+	int				*r_locked;
 	int				state;
 //	int				time_to_eat;
 //	int				time_to_sleep;
@@ -66,7 +68,7 @@ int	timestamp(t_philo philo, t_rules rules, int state)
 		printf("%d\t%d died\n", time_passed, philo.id);
 	if (state == 6)
 		printf("%d\t%d ___check dying___\n", time_passed, philo.id);
-	return (0);	
+	return (0);
 }
 
 void	*eat(void *args)
@@ -80,14 +82,38 @@ void	*eat(void *args)
 		if (philo->id % 2 == 0)
 		{
 			pthread_mutex_lock(&(philo->l_fork));
+			if (philo->l_locked)
+				while (philo->l_locked)
+					usleep(100);
+			else
+				philo->l_locked = 1;
+			pthread_mutex_unlock(&(philo->l_fork));
 			timestamp(*philo, *rules, 1);
 			pthread_mutex_lock(philo->r_fork);
+			if (*philo->r_locked)
+				while (*philo->r_locked)
+					usleep(100);
+			else
+				*philo->r_locked = 1;
+			pthread_mutex_unlock(philo->r_fork);
 		}
 		else
 		{
 			pthread_mutex_lock(philo->r_fork);
+			if (*philo->r_locked)
+				while (*philo->r_locked)
+					usleep(100);
+			else
+				*philo->r_locked = 1;
+			pthread_mutex_unlock(philo->r_fork);
 			timestamp(*philo, *rules, 1);
 			pthread_mutex_lock(&(philo->l_fork));
+			if (philo->l_locked)
+				while (philo->l_locked)
+					usleep(100);
+			else
+				philo->l_locked = 1;
+			pthread_mutex_unlock(&(philo->l_fork));
 		}
 /*		pthread_mutex_lock(philo->r_fork);
 		timestamp(*philo, *rules, 1);
@@ -96,8 +122,10 @@ void	*eat(void *args)
 		timestamp(*philo, *rules, 2);
 //		printf("Philo's [%d] eating\n", philo->id);
 		usleep(rules->time_to_eat * 1000);
-		pthread_mutex_unlock(&(philo->l_fork));
-		pthread_mutex_unlock(philo->r_fork);
+		philo->l_locked = 0;
+		*philo->r_locked = 0;
+//		pthread_mutex_unlock(&(philo->l_fork));
+//		pthread_mutex_unlock(philo->r_fork);
 		timestamp(*philo, *rules, 3);
 //		printf("Philo's [%d] sleeping\n", philo->id);
 		usleep(rules->time_to_sleep * 1000);
@@ -107,16 +135,16 @@ void	*eat(void *args)
 	}
 }
 
-void	*dead(void *args) 	
+void	*dead(void *args)
 {
 	t_philo	*philo = ((t_args *)args)->philo;
 	t_rules	*rules = ((t_args *)args)->rules;
 	while (1)
 	{
-		usleep(rules->time_to_die * 1000);	
+		usleep(rules->time_to_die * 1000);
 		timestamp(*philo, *rules, 6);
 //		printf("Check dying philo %d\n", philo->id);
-	}	
+	}
 }
 
 int	main()
@@ -140,10 +168,17 @@ int	main()
 	{
 		philos[i].id = i + 1;
 		pthread_mutex_init(&(philos[i].l_fork), NULL);
+		philos[i].l_locked = 0;
 		if (i == nb_philo - 1)
+		{
 			philos[i].r_fork = &philos[0].l_fork;
+			philos[i].r_locked = &philos[0].l_locked;
+		}
 		else
+		{
 			philos[i].r_fork = &philos[i + 1].l_fork;
+			philos[i].r_locked = &philos[i + 1].l_locked;
+		}
 //		if (!i)
 //			error = philos[i].tv_beg
 		i++;
@@ -158,7 +193,7 @@ int	main()
 		args[i].philo = &(philos[i]);
 		args[i].rules = &rules;
 		pthread_create(&(philos[i].t_id), NULL, &eat, (void *)&args[i]);
-		pthread_create(&(philos[i].t_id), NULL, &dead, (void *)&args[i]);
+//		pthread_create(&(philos[i].t_id), NULL, &dead, (void *)&args[i]);
 		i++;
 	}
 	// thread_join
