@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 10:15:05 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/18 01:18:57 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/20 01:32:36 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_rules
 	int				time_to_sleep;
 	int				time_to_die;
 	struct timeval	tv_beg;
+//	int				count;
 }				t_rules;
 
 typedef struct s_args
@@ -131,8 +132,11 @@ void	*eat(void *args)
 		usleep(rules->time_to_sleep * 1000);
 		timestamp(*philo, *rules, 4);
 		usleep(100);
+/*		rules->count++;
+		printf("TEST: Philo %d did the cycle %d\n", philo->id, rules->count);*/
 //		printf("Philo's [%d] thinking\n", philo->id);
 	}
+	free(args);
 }
 
 void	*dead(void *args)
@@ -161,6 +165,7 @@ int	main()
 	rules.time_to_die = 700;
 	rules.time_to_eat = 200;
 	rules.time_to_sleep = 200;
+//	rules.count = 0;
 	if (gettimeofday(&(rules.tv_beg), NULL))
 		return (1);
 	// Remplir ces caracteristiques
@@ -183,16 +188,18 @@ int	main()
 //			error = philos[i].tv_beg
 		i++;
 	}
-	args = malloc(sizeof(t_args) * nb_philo);
+//	args = malloc(sizeof(t_args) * nb_philo);
 	// Envoyer programme
 	i = 0;
 	while (i < nb_philo)
 	{
 		if (philos[i].id % 2 == 1 )
 				usleep(100);
-		args[i].philo = &(philos[i]);
-		args[i].rules = &rules;
-		pthread_create(&(philos[i].t_id), NULL, &eat, (void *)&args[i]);
+		args = malloc(sizeof(t_args));
+		args->philo = &(philos[i]);
+		args->rules = &rules;
+		if (pthread_create(&(philos[i].t_id), NULL, &eat, (void *)args))
+			return (1);
 //		pthread_create(&(philos[i].t_id), NULL, &dead, (void *)&args[i]);
 		i++;
 	}
@@ -200,7 +207,7 @@ int	main()
 	i = 0;
 	while (i < nb_philo)
 	{
-		pthread_join(philos[i].t_id, NULL);
+		if (pthread_join(philos[i].t_id, NULL));
 		i++;
 	}
 	// Destroy mutex
