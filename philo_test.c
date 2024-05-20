@@ -6,16 +6,16 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 10:15:05 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/20 18:17:59 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/20 18:36:55 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <string.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <sys/time.h>
-# include <pthread.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <pthread.h>
 //# include "philo.h"
 
 // Philosopher simplifie
@@ -30,9 +30,6 @@ typedef struct s_philo
 	int				*r_locked;
 	int				state;
 	struct timeval	last_eat;
-//	int				time_to_eat;
-//	int				time_to_sleep;
-//	int				time_to_die;
 }				t_philo;
 
 typedef struct s_rules
@@ -43,13 +40,12 @@ typedef struct s_rules
 	int				time_to_die;
 	struct timeval	tv_beg;
 	int				finished;
-//	int				count;
 }				t_rules;
 
 typedef struct s_args
 {
 	t_philo	*philo;
-	t_rules *rules;
+	t_rules	*rules;
 }				t_args;
 
 static int	ft_isdigit(int c)
@@ -86,7 +82,6 @@ int	ft_atoi(const char *nptr)
 	return (n * sign);
 }
 
-
 int	timestamp(t_philo philo, t_rules rules, int state)
 {
 	struct timeval	tv_act;
@@ -97,7 +92,8 @@ int	timestamp(t_philo philo, t_rules rules, int state)
 	usleep(100);
 	if (gettimeofday(&tv_act, NULL))
 		return (1);
-	time_passed = (((tv_act.tv_sec - rules.tv_beg.tv_sec) * 1000) + ((tv_act.tv_usec - rules.tv_beg.tv_usec) / 1000));
+	time_passed = (((tv_act.tv_sec - rules.tv_beg.tv_sec) * 1000)
+			+ ((tv_act.tv_usec - rules.tv_beg.tv_usec) / 1000));
 	if (state == 1)
 		printf("%d\t%d has taken a fork\n", time_passed, philo.id);
 	else if (state == 2)
@@ -117,7 +113,8 @@ void	*eat(void *args)
 {
 	t_philo	*philo = ((t_args *)args)->philo;
 	t_rules	*rules = ((t_args *)args)->rules;
-	if (philo->id % 2 == 1 )
+
+	if (philo->id % 2 == 1)
 		usleep(100);
 	while (!rules->finished)
 	{
@@ -131,7 +128,7 @@ void	*eat(void *args)
 				philo->l_locked = 1;
 			pthread_mutex_unlock(&(philo->l_fork));
 			if (timestamp(*philo, *rules, 1))
-				break;
+				break ;
 			pthread_mutex_lock(philo->r_fork);
 			if (*philo->r_locked)
 				while (*philo->r_locked)
@@ -150,7 +147,7 @@ void	*eat(void *args)
 				*philo->r_locked = 1;
 			pthread_mutex_unlock(philo->r_fork);
 			if (timestamp(*philo, *rules, 1))
-				break;;
+				break ;
 			pthread_mutex_lock(&(philo->l_fork));
 			if (philo->l_locked)
 				while (philo->l_locked)
@@ -159,54 +156,43 @@ void	*eat(void *args)
 				philo->l_locked = 1;
 			pthread_mutex_unlock(&(philo->l_fork));
 		}
-/*		pthread_mutex_lock(philo->r_fork);
-		timestamp(*philo, *rules, 1);
-		pthread_mutex_lock(&(philo->l_fork));*/
-//		philo->state == 1;
 		if (timestamp(*philo, *rules, 2))
-			break;
-//		printf("Philo's [%d] eating\n", philo->id);
+			break ;
 		if (gettimeofday(&(philo->last_eat), NULL))
 			return (NULL);
 		usleep(rules->time_to_eat * 1000);
 		philo->l_locked = 0;
 		*philo->r_locked = 0;
-//		pthread_mutex_unlock(&(philo->l_fork));
-//		pthread_mutex_unlock(philo->r_fork);
 		if (timestamp(*philo, *rules, 3))
-			break;
-//		printf("Philo's [%d] sleeping\n", philo->id);
+			break ;
 		usleep(rules->time_to_sleep * 1000);
 		if (timestamp(*philo, *rules, 4))
-			break;
+			break ;
 		usleep(100);
-/*		rules->count++;
-		printf("TEST: Philo %d did the cycle %d\n", philo->id, rules->count);*/
-//		printf("Philo's [%d] thinking\n", philo->id);
 	}
 	free(args);
 }
 
 void	*dead(void *args)
 {
-	t_philo	*philo = ((t_args *)args)->philo;
-	t_rules	*rules = ((t_args *)args)->rules;
-	int		frequence = 1000;
-	int		time_passed;
+	t_philo			*philo = ((t_args *)args)->philo;
+	t_rules			*rules = ((t_args *)args)->rules;
+	int				frequence = 1000;
+	int				time_passed;
 	struct timeval	tv_act;
-	
+
 	while (!rules->finished)
 	{
 		if (gettimeofday(&tv_act, NULL))
-			return (NULL); 
-		time_passed = (((tv_act.tv_sec - philo->last_eat.tv_sec) * 1000) + ((tv_act.tv_usec - philo->last_eat.tv_usec) / 1000));
+			return (NULL);
+		time_passed = (((tv_act.tv_sec - philo->last_eat.tv_sec) * 1000)
+				+ ((tv_act.tv_usec - philo->last_eat.tv_usec) / 1000));
 		if (time_passed > rules->time_to_die)
 		{
 			timestamp(*philo, *rules, 5);
 			rules->finished = 1;
 		}
 		usleep (frequence);
-//		printf("Check dying philo %d\n", philo->id);
 	}
 }
 
@@ -218,17 +204,13 @@ int	main(int argc, char **argv)
 	t_args	*args;
 	int		i = 0;
 
-	// Creer tableau de philo
-	// Remplir les rules
 	rules.nb_philo = nb_philo;
 	rules.time_to_die = ft_atoi(argv[2]);
 	rules.time_to_eat = ft_atoi(argv[3]);
 	rules.time_to_sleep = ft_atoi(argv[4]);
 	rules.finished = 0;
-//	rules.count = 0;
 	if (gettimeofday(&(rules.tv_beg), NULL))
 		return (1);
-	// Remplir ces caracteristiques
 	while (i < nb_philo)
 	{
 		philos[i].id = i + 1;
@@ -246,17 +228,13 @@ int	main(int argc, char **argv)
 			philos[i].r_fork = &philos[i + 1].l_fork;
 			philos[i].r_locked = &philos[i + 1].l_locked;
 		}
-//		if (!i)
-//			error = philos[i].tv_beg
 		i++;
 	}
-//	args = malloc(sizeof(t_args) * nb_philo);
-	// Envoyer programme
 	i = 0;
 	while (i < nb_philo)
 	{
-		if (philos[i].id % 2 == 1 )
-				usleep(100);
+		if (philos[i].id % 2 == 1)
+			usleep(100);
 		args = malloc(sizeof(t_args));
 		args->philo = &(philos[i]);
 		args->rules = &rules;
@@ -266,7 +244,6 @@ int	main(int argc, char **argv)
 			return (1);
 		i++;
 	}
-	// thread_join
 	i = 0;
 	while (i < nb_philo)
 	{
@@ -274,12 +251,10 @@ int	main(int argc, char **argv)
 			return (1);
 		i++;
 	}
-	// Destroy mutex
 	i = 0;
 	while (i < nb_philo)
 	{
 		pthread_mutex_destroy(&(philos[i].l_fork));
-	//	pthread_de
 		i++;
 	}
 	return (0);
