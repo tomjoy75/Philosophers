@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/21 15:37:05 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/21 22:47:19 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_philo
 	pthread_mutex_t	*r_fork;
 	int				*r_locked;
 	int				state;
+	int				meal;
 	struct timeval	last_eat;
 }				t_philo;
 
@@ -52,6 +53,7 @@ typedef struct s_rules
 	int				time_to_die;
 	struct timeval			tv_beg;
 	int				finished;
+	int				nb_of_meals;
 }				t_rules;
 
 typedef struct s_args

@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/21 15:46:46 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/21 23:31:42 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,17 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 	rules->time_to_die = ft_atol(argv[2]);
 	rules->time_to_eat = ft_atol(argv[3]);
 	rules->time_to_sleep = ft_atol(argv[4]);
+	if (argc == 5)
+		rules->nb_of_meals = -2;
+	else if (argc == 6)
+		rules->nb_of_meals = ft_atol(argv[5]);
 	if (rules->nb_philo == -1 || rules->time_to_die == -1
-		|| rules->time_to_eat == -1 || rules->time_to_sleep == -1)
+		|| rules->time_to_eat == -1 || rules->time_to_sleep == -1
+		|| rules->nb_of_meals == -1)
 		return (-1);
 	if (!rules->nb_philo)
 		return (error_exit("At least 1 philosopher\n"));
 	rules->finished = 0;
 	gettimeofday(&(rules->tv_beg), NULL);
 	return (0);
-}		
+}
