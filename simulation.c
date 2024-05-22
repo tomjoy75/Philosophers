@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 16:10:22 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/23 00:53:50 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static void	*routine(void *args)
 
 	if (philo->id % 2 == 1)
 		usleep(100);
-	while (!rules->finished)
+	while (rules->nb_eating > 0)
 	{
 		if (philo->id % 2 == 0)
 		{
@@ -106,6 +106,15 @@ static void	*routine(void *args)
 		}
 		if (timestamp(*philo, *rules, 2))
 			break ;
+		if (rules->nb_of_meals != -2)
+		{
+			philo->meal++;
+			if (philo->meal >= rules->nb_of_meals)
+			{
+				printf("!!!philo %d has finished the %d meal!!!\n", philo->id, philo->meal);
+				rules->nb_eating--;
+				break ;
+			}
 		if (gettimeofday(&(philo->last_eat), NULL))
 			return (NULL);
 		usleep(rules->time_to_eat * 1000);
@@ -117,6 +126,7 @@ static void	*routine(void *args)
 		if (timestamp(*philo, *rules, 4))
 			break ;
 		usleep(100);
+		}
 	}
 	free(args);
 }
@@ -129,7 +139,7 @@ void	*dead(void *args)
 	int				time_passed;
 	struct timeval	tv_act;
 
-	while (!rules->finished)
+	while (rules->nb_eating > 0)
 	{
 		if (gettimeofday(&tv_act, NULL))
 			return (NULL);
@@ -138,7 +148,7 @@ void	*dead(void *args)
 		if (time_passed > rules->time_to_die)
 		{
 			timestamp(*philo, *rules, 5);
-			rules->finished = 1;
+			rules->nb_eating = 0;
 		}
 		usleep (frequence);
 	}

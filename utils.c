@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 15:34:19 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/23 00:50:44 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	timestamp(t_philo philo, t_rules rules, int state)
 	struct timeval	tv_act;
 	int				time_passed;
 
-	if (rules.finished)
+	if (!rules.nb_eating)
 		return (1);
 	usleep(100);
 	if (gettimeofday(&tv_act, NULL))

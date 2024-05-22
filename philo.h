@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 15:47:54 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/23 00:38:25 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ typedef struct s_rules
 	int				time_to_sleep;
 	int				time_to_die;
 	struct timeval			tv_beg;
-	int				finished;
+	int				nb_eating;
 	int				nb_of_meals;
 }				t_rules;
 
