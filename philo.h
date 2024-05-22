@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 14:04:46 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 15:47:54 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,5 +67,7 @@ int	error_exit(const char *error);
 void	*error_exit_NULL(const char *error);
 int	parse_input(t_rules *rules, int argc, char **argv);
 void	clean_all(t_philo *philos, int n_mutex);
+int	timestamp(t_philo philo, t_rules rules, int state);
+int	start_simulation(t_philo *philos, t_rules *rules);
 
 #endif

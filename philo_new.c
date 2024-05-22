@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 13:02:02 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 15:50:51 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ int	main(int argc, char **argv)
 // 2) init
 // 3) start_simulation
 // __end when all philos are fed | 1 philo died
+	if (start_simulation(philos, &rules))
+		return (1);
 // 4) clean_tables //check leaks
 	clean_all(philos, rules.nb_philo);
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 14:04:20 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 15:34:19 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,3 +36,31 @@ void	clean_all(t_philo *philos, int n_mutex)
 	}
 	free (philos);
 }
+
+int	timestamp(t_philo philo, t_rules rules, int state)
+{
+	struct timeval	tv_act;
+	int				time_passed;
+
+	if (rules.finished)
+		return (1);
+	usleep(100);
+	if (gettimeofday(&tv_act, NULL))
+		return (1);
+	time_passed = (((tv_act.tv_sec - rules.tv_beg.tv_sec) * 1000)
+			+ ((tv_act.tv_usec - rules.tv_beg.tv_usec) / 1000));
+	if (state == 1)
+		printf("%d\t%d has taken a fork\n", time_passed, philo.id);
+	else if (state == 2)
+		printf("%d\t%d is eating\n", time_passed, philo.id);
+	else if (state == 3)
+		printf("%d\t%d is sleeping\n", time_passed, philo.id);
+	else if (state == 4)
+		printf("%d\t%d is thinking\n", time_passed, philo.id);
+	else if (state == 5)
+		printf("\e[31m%d\t%d died\n\e[0m", time_passed, philo.id);
+	else if (state == 6)
+		printf("%d\t%d ___check dying___\n", time_passed, philo.id);
+	return (0);
+}
+
