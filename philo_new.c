@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 15:50:51 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 16:26:04 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	main(int argc, char **argv)
 // 1) parse input
 	if (parse_input(&rules, argc, argv))
 		return (1);
-	printf("nb_philo\t%d\ntime to eat\t%d\ntime to sleep\t%d\ntime to die\t%d\n", rules.nb_philo, rules.time_to_eat, rules.time_to_sleep, rules.time_to_die); 
+//	printf("nb_philo\t%d\ntime to eat\t%d\ntime to sleep\t%d\ntime to die\t%d\n", rules.nb_philo, rules.time_to_eat, rules.time_to_sleep, rules.time_to_die); 
 	philos = malloc(sizeof(t_philo) * rules.nb_philo);
 	if (!philos)
 		return (1);
