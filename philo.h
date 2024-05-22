@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/21 22:47:19 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 14:04:46 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ typedef struct s_args
 
 int	ft_atoi(const char *nptr);
 int	error_exit(const char *error);
+void	*error_exit_NULL(const char *error);
 int	parse_input(t_rules *rules, int argc, char **argv);
+void	clean_all(t_philo *philos, int n_mutex);
 
 #endif

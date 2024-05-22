@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/21 23:31:42 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 13:57:52 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static inline int	is_space(char c)
 
 // Check is correctly formated number
 // return 1 if correct, 0 if not
-int	is_not_valid_arg(char *str)
+char	*is_valid_arg(char *str)
 {
 	int		len;
 	char	*num;
@@ -35,9 +35,9 @@ int	is_not_valid_arg(char *str)
 	if (*str == '+')
 		str++;
 	else if (*str == '-')
-		return (error_exit("Only positive values\n"));
+		return (error_exit_NULL("Only positive values\n"));
 	if (!is_number(*str))
-		return (error_exit("Please reformat the number\n"));
+		return (error_exit_NULL("Please reformat the number\n"));
 	num = str;
 	while (is_number(*str))
 	{
@@ -45,8 +45,8 @@ int	is_not_valid_arg(char *str)
 		len++;
 	}
 	if (len > 10)
-		return (error_exit("Arg should't be > INT_MAX\n"));
-	return (0);
+		return (error_exit_NULL("Arg should't be > INT_MAX\n"));
+	return (num);
 }
 
 int	ft_atol(char *str)
@@ -54,7 +54,8 @@ int	ft_atol(char *str)
 	long	n;
 
 	n = 0;
-	if (is_not_valid_arg(str))
+	str = is_valid_arg(str);
+	if (!str)
 		return (-1);
 	while (is_number(*str))
 	{

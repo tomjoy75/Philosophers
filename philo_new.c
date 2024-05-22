@@ -6,14 +6,14 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/21 23:45:20 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/22 13:02:02 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 // Clean all the mutexes and free philos
-void	clean_all(t_philo *philos, int n_mutex)
+/*void	clean_all(t_philo *philos, int n_mutex)
 {
 	int	i;
 
@@ -25,7 +25,7 @@ void	clean_all(t_philo *philos, int n_mutex)
 	}
 	free (philos);
 }
-
+*/
 int	init_philos(int nb_philo, t_philo *philos)
 {
 	int	i;
