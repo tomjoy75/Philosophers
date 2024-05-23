@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/23 00:38:25 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/23 16:28:12 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_rules
 	struct timeval			tv_beg;
 	int				nb_eating;
 	int				nb_of_meals;
+	int				error_flag;
 }				t_rules;
 
 typedef struct s_args

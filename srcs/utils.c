@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/23 00:50:44 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/23 18:36:13 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ int	timestamp(t_philo philo, t_rules rules, int state)
 	else if (state == 4)
 		printf("%d\t%d is thinking\n", time_passed, philo.id);
 	else if (state == 5)
-		printf("\e[31m%d\t%d died\n\e[0m", time_passed, philo.id);
+//		printf("\e[31m%d\t%d died\n\e[0m", time_passed, philo.id);
+		printf("%d\t%d died\n", time_passed, philo.id);
 	else if (state == 6)
 		printf("%d\t%d ___check dying___\n", time_passed, philo.id);
 	return (0);
