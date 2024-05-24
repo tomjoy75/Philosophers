@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/23 18:34:25 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/24 14:45:52 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,8 @@ static void	*routine(void *args)
 		usleep(rules->time_to_sleep * 1000);
 		if (timestamp(*philo, *rules, 4))
 			return(rules->error_flag = 1, NULL);
-		usleep(100);
+		while (*philo->r_fork || philo->l_fork)
+			usleep(100);
 	}
 	free(args);
 	return (NULL);
