@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/26 23:53:24 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/27 00:51:59 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	lock_even_philo(t_philo *philo, t_rules *rules)
 	}
 	philo->l_locked = 1;
 	pthread_mutex_unlock(&(philo->l_fork));
-	if (timestamp(*philo, *rules, 1))
+	if (timestamp(*philo, rules, 1))
 		return (1);
 	pthread_mutex_lock(philo->r_fork);
 	while (*philo->r_locked /*|| !check_priority(philo, rules)*/)
@@ -54,7 +54,7 @@ static int	lock_odd_philo(t_philo *philo, t_rules *rules)
 	}
 	*philo->r_locked = 1;
 	pthread_mutex_unlock(philo->r_fork);
-	if (timestamp(*philo, *rules, 1))
+	if (timestamp(*philo, rules, 1))
 		return (1) ;
 	pthread_mutex_lock(&(philo->l_fork));
 	while (philo->l_locked /*|| !check_priority(philo, rules)*/)
@@ -87,7 +87,7 @@ static void	*routine(void *args)
 			if (lock_odd_philo(philo, rules))
 				return(rules->error_flag = 1, NULL);
 		}
-		if (timestamp(*philo, *rules, 2))
+		if (timestamp(*philo, rules, 2))
 			return(rules->error_flag = 1, NULL);
 		if (gettimeofday(&(philo->last_eat), NULL))
 			return(rules->error_flag = 1, NULL);
@@ -108,10 +108,10 @@ static void	*routine(void *args)
 				break ;
 			}
 		}
-		if (timestamp(*philo, *rules, 3))
+		if (timestamp(*philo, rules, 3))
 			return(rules->error_flag = 1, NULL);
 		usleep(rules->time_to_sleep * 1000);
-		if (timestamp(*philo, *rules, 4))
+		if (timestamp(*philo, rules, 4))
 			return(rules->error_flag = 1, NULL);
 		if (rules->nb_philo % 2 && rules->time_to_eat >= rules->time_to_sleep)
 			usleep((rules->time_to_eat - rules->time_to_sleep + 1) * 1000);
@@ -144,7 +144,7 @@ void	*dead(void *args)
 				+ ((tv_act.tv_usec - philo->last_eat.tv_usec) / 1000));
 		if (time_passed > rules->time_to_die)
 		{
-			timestamp(*philo, *rules, 5);
+			timestamp(*philo, rules, 5);
 			rules->nb_of_meals = 0;
 		}
 		// TODO: Gestion de priorite

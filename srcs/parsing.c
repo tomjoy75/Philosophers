@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/26 12:00:17 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/27 00:24:01 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 	rules->time_to_eat = ft_atol(argv[3]);
 	rules->time_to_sleep = ft_atol(argv[4]);
 	rules->error_flag = 0;
+	rules->write_off = 0;
 	if (argc == 5)
 		rules->nb_of_meals = -2;
 	else if (argc == 6)

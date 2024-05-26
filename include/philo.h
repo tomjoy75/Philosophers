@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/26 11:44:28 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/27 00:26:32 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ typedef struct s_rules
 	int				error_flag;
 	int				last_eat_max;
 	int				priority;
+	int				write_off;
 }				t_rules;
 
 typedef struct s_args
@@ -70,7 +71,7 @@ int	error_exit(const char *error);
 void	*error_exit_NULL(const char *error);
 int	parse_input(t_rules *rules, int argc, char **argv);
 void	clean_all(t_philo *philos, int n_mutex);
-int	timestamp(t_philo philo, t_rules rules, int state);
+int	timestamp(t_philo philo, t_rules *rules, int state);
 int	start_simulation(t_philo *philos, t_rules *rules);
 
 #endif
