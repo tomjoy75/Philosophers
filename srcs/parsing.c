@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/23 16:31:55 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/26 12:00:17 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,5 +95,8 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 		return (error_exit("At least 1 philosopher\n"));
 //	rules->finished = 0;
 	gettimeofday(&(rules->tv_beg), NULL);
+	rules->last_eat_max = 0;
+	if (rules->nb_philo > 1)
+		rules->priority = 2;
 	return (0);
 }
