@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simulation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/27 00:51:59 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/27 18:08:52 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ static int	lock_even_philo(t_philo *philo, t_rules *rules)
 	}
 	philo->l_locked = 1;
 	pthread_mutex_unlock(&(philo->l_fork));
+	// Take a fork
 	if (timestamp(*philo, rules, 1))
 		return (1);
 	pthread_mutex_lock(philo->r_fork);
@@ -54,6 +55,7 @@ static int	lock_odd_philo(t_philo *philo, t_rules *rules)
 	}
 	*philo->r_locked = 1;
 	pthread_mutex_unlock(philo->r_fork);
+	// Take a fork
 	if (timestamp(*philo, rules, 1))
 		return (1) ;
 	pthread_mutex_lock(&(philo->l_fork));
@@ -72,8 +74,8 @@ static void	*routine(void *args)
 {
 	t_philo	*philo = ((t_args *)args)->philo;
 	t_rules	*rules = ((t_args *)args)->rules;
-	if (philo->id % 2 == 1)
-		usleep(200);
+	if (philo->id % 2 == 0)
+		usleep(40 * rules->nb_philo);
 //	while (rules->nb_eating > 0)
 	while (philo->meal < rules->nb_of_meals || rules->nb_of_meals == -2) 
 	{
@@ -87,9 +89,10 @@ static void	*routine(void *args)
 			if (lock_odd_philo(philo, rules))
 				return(rules->error_flag = 1, NULL);
 		}
-		if (timestamp(*philo, rules, 2))
-			return(rules->error_flag = 1, NULL);
+		// Eating 
 		if (gettimeofday(&(philo->last_eat), NULL))
+			return(rules->error_flag = 1, NULL);
+		if (timestamp(*philo, rules, 2))
 			return(rules->error_flag = 1, NULL);
 		usleep(rules->time_to_eat * 1000);
 		pthread_mutex_lock(&(philo->l_fork));
@@ -98,6 +101,9 @@ static void	*routine(void *args)
 		pthread_mutex_lock(philo->r_fork);
 		*philo->r_locked = 0;
 		pthread_mutex_unlock(philo->r_fork);
+		// Sleeping
+		if (timestamp(*philo, rules, 3))
+			return(rules->error_flag = 1, NULL);
 		if (rules->nb_of_meals != -2)
 		{
 			philo->meal++;
@@ -108,13 +114,17 @@ static void	*routine(void *args)
 				break ;
 			}
 		}
-		if (timestamp(*philo, rules, 3))
-			return(rules->error_flag = 1, NULL);
 		usleep(rules->time_to_sleep * 1000);
+		// Thinking
 		if (timestamp(*philo, rules, 4))
 			return(rules->error_flag = 1, NULL);
-		if (rules->nb_philo % 2 && rules->time_to_eat >= rules->time_to_sleep)
-			usleep((rules->time_to_eat - rules->time_to_sleep + 1) * 1000);
+		if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
+			usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
+		else if (rules->nb_philo % 2 && rules->time_to_eat == rules->time_to_sleep)
+		{
+//			printf ("Philo %d Activate thinking time : %d\n", philo->id, (rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) / 3);
+			usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) * 1000 / 2);//TODO:Cas retour negatif
+		}
 		while (*philo->r_locked || philo->l_locked)
 			usleep(100);
 	}
@@ -131,7 +141,7 @@ void	*dead(void *args)
 {
 	t_philo			*philo = ((t_args *)args)->philo;
 	t_rules			*rules = ((t_args *)args)->rules;
-	int				frequence = 1000;
+	int				frequence = 100;
 	int				time_passed;
 	struct timeval	tv_act;
 
@@ -140,10 +150,11 @@ void	*dead(void *args)
 	{
 		if (gettimeofday(&tv_act, NULL))
 			return (NULL);
-		time_passed = (((tv_act.tv_sec - philo->last_eat.tv_sec) * 1001)
+		time_passed = (((tv_act.tv_sec - philo->last_eat.tv_sec) * 1000)
 				+ ((tv_act.tv_usec - philo->last_eat.tv_usec) / 1000));
 		if (time_passed > rules->time_to_die)
 		{
+			// Died
 			timestamp(*philo, rules, 5);
 			rules->nb_of_meals = 0;
 		}
