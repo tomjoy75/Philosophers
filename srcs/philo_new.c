@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_new.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/22 16:26:04 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/28 13:33:16 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 	free (philos);
 }
 */
-int	init_philos(int nb_philo, t_philo *philos)
+int	init_philos(int nb_philo, t_philo *philos, t_rules *rules)
 {
 	int	i;
 
@@ -52,6 +52,7 @@ int	init_philos(int nb_philo, t_philo *philos)
 		}
 		i++;
 	}
+	rules->philos = philos;
 	return (0);
 }
 
@@ -67,7 +68,7 @@ int	main(int argc, char **argv)
 	philos = malloc(sizeof(t_philo) * rules.nb_philo);
 	if (!philos)
 		return (1);
-	if (init_philos(rules.nb_philo, philos))
+	if (init_philos(rules.nb_philo, philos, &rules))
 		return (1);
 // init the structs
 // 2) init

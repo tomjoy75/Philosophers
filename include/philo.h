@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/27 00:26:32 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/28 13:29:55 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_philo
 
 typedef struct s_rules
 {
+	pthread_t		t_dead;
 	int				nb_philo;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -58,6 +59,7 @@ typedef struct s_rules
 	int				last_eat_max;
 	int				priority;
 	int				write_off;
+	t_philo			*philos;
 }				t_rules;
 
 typedef struct s_args

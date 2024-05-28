@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/27 18:08:52 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/28 13:36:44 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,8 +139,8 @@ int	is_prior(t_philo *philo, t_rules *rules)
 */
 void	*dead(void *args)
 {
-	t_philo			*philo = ((t_args *)args)->philo;
-	t_rules			*rules = ((t_args *)args)->rules;
+	t_rules			*rules = (t_rules *)args;
+	t_philo			*philos = rules->philos;
 	int				frequence = 100;
 	int				time_passed;
 	struct timeval	tv_act;
@@ -177,7 +177,7 @@ void	*dead(void *args)
 int	start_simulation(t_philo *philos, t_rules *rules)
 {
 	int	i;
-	t_args	*args;
+	t_args	*args = malloc(sizeof(t_args));
 
 	i = 0;
 	while (i < rules->nb_philo)
@@ -189,10 +189,10 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 		args->rules = rules;
 		if (pthread_create(&(philos[i].t_id), NULL, &routine, (void *)args))
 			return (free(args), 1);
-		if (pthread_create(&(philos[i].t_id), NULL, &dead, (void *)args))
-			return (free(args), 1);
 		i++;
 	}
+	if (pthread_create(&(rules->t_dead), NULL, &dead, (void *)rules))
+		return (free(args), 1);
 	i = 0;
 	while (i < rules->nb_philo)
 	{
