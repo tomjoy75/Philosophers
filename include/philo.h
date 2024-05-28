@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/28 13:29:55 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/28 23:35:11 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ typedef struct s_philo
 
 typedef struct s_rules
 {
-	pthread_t		t_dead;
+	pthread_t		t_monitor;
 	int				nb_philo;
 	int				time_to_eat;
 	int				time_to_sleep;

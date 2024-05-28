@@ -1,0 +1,8 @@
+.build_done
+.build_started
+*.o
+philo
+test*
+*.swp
+a.out
+42-philosophers-tester

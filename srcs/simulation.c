@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/28 16:33:50 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/29 00:51:57 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,13 +176,14 @@ void	*dead(void *args)
 
 void	*monitor(void *args)
 {
-	t_rules			*rules = (t_rules *)args;
-	// t_philo			*philos = rules->philos;
+//	t_rules			*rules = (t_rules *)args;
+//	t_philo			*philos = rules->philos;
 	// int				frequence = 100;
 	// int				time_passed;
 	// struct timeval	tv_act;
 	// int				i;
 
+	(void)args;
 	// Pour chaques philosophe :
 	// 1 . Verifier si il a mange tous les repas
 	// 2 . Verifier si il est mort
@@ -191,7 +192,8 @@ void	*monitor(void *args)
 	{
 		
 	}*/
-	printf ("Monitoring %d philos\n", rules->nb_philo);
+//	printf ("Monitoring %d philos\n", rules->nb_philo);
+//	printf ("Monitoring philos %d\n", *philos->id);
 	return (NULL);
 }
 
@@ -213,7 +215,7 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
-	if (pthread_create(&(rules->t_dead), NULL, &monitor, (void *)rules))
+	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
 		return (free(args), 1);
 	i = 0;
 	while (i < rules->nb_philo)
@@ -222,7 +224,7 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
-	if (pthread_join(philos[i].t_id, NULL))
+	if (pthread_join(rules->t_monitor, NULL))
 		return (free(args), 1);
 	if (rules->error_flag)
 		return (free(args), 1);

@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/27 00:24:01 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/29 00:39:01 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,10 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 	if (!rules->nb_philo)
 		return (error_exit("At least 1 philosopher\n"));
 //	rules->finished = 0;
-	gettimeofday(&(rules->tv_beg), NULL);
+	gettimeofday(&(rules->tv_beg), NULL); //A proteger
 	rules->last_eat_max = 0;
 	if (rules->nb_philo > 1)
 		rules->priority = 2;
+	printf("value of nb_philo in parse_input : %d\n", rules->nb_philo);
 	return (0);
 }
