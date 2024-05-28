@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/28 13:36:44 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/05/28 16:33:50 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ int	is_prior(t_philo *philo, t_rules *rules)
 	
 }
 */
+/*
 void	*dead(void *args)
 {
 	t_rules			*rules = (t_rules *)args;
@@ -163,13 +164,34 @@ void	*dead(void *args)
 		// 1 . Condition
 		// 2 . Initialisation (last_eat_max & priority)
 		// 3 . Mettre dans les conditions de routine
-/*		else if (time_passed > rules->last_eat_max)
-		{
-			rules->last_eat_max = 
-			rules->priority = philo->id;
-		}*/
+// 		else if (time_passed > rules->last_eat_max)
+// 		{
+// 			rules->last_eat_max = 
+// 			rules->priority = philo->id;
+// 		}
 		usleep (frequence);
 	}
+	return (NULL);
+}*/
+
+void	*monitor(void *args)
+{
+	t_rules			*rules = (t_rules *)args;
+	// t_philo			*philos = rules->philos;
+	// int				frequence = 100;
+	// int				time_passed;
+	// struct timeval	tv_act;
+	// int				i;
+
+	// Pour chaques philosophe :
+	// 1 . Verifier si il a mange tous les repas
+	// 2 . Verifier si il est mort
+	//i = 0;
+/*	while (1)
+	{
+		
+	}*/
+	printf ("Monitoring %d philos\n", rules->nb_philo);
 	return (NULL);
 }
 
@@ -191,7 +213,7 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
-	if (pthread_create(&(rules->t_dead), NULL, &dead, (void *)rules))
+	if (pthread_create(&(rules->t_dead), NULL, &monitor, (void *)rules))
 		return (free(args), 1);
 	i = 0;
 	while (i < rules->nb_philo)
@@ -200,6 +222,8 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
+	if (pthread_join(philos[i].t_id, NULL))
+		return (free(args), 1);
 	if (rules->error_flag)
 		return (free(args), 1);
 	return (free(args), 0);
