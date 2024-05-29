@@ -6,7 +6,7 @@
 /*   By: tjoyeux <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/29 00:47:40 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/29 17:12:15 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int	timestamp(t_philo philo, t_rules *rules, int state)
 		return (1);
 	time_passed = (((tv_act.tv_sec - rules->tv_beg.tv_sec) * 1000)
 			+ ((tv_act.tv_usec - rules->tv_beg.tv_usec) / 1000));
+	pthread_mutex_lock(&rules->print_mutex);
 	if (!rules->write_off)
 	{
 		if (state == 1)
@@ -68,6 +69,7 @@ int	timestamp(t_philo philo, t_rules *rules, int state)
 		else if (state == 6)
 			printf("%d\t%d ___check dying___\n", time_passed, philo.id);
 	}
+	pthread_mutex_unlock(&rules->print_mutex);
 	return (0);
 }
 

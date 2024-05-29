@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/29 00:51:57 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/30 01:21:31 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ static void	*routine(void *args)
 		// Sleeping
 		if (timestamp(*philo, rules, 3))
 			return(rules->error_flag = 1, NULL);
+		pthread_mutex_lock(&(rules->eating_mutex));
 		if (rules->nb_of_meals != -2)
 		{
 			philo->meal++;
@@ -111,9 +112,11 @@ static void	*routine(void *args)
 			{
 //				printf("!!!philo %d has finished the %d meal!!!\n", philo->id, philo->meal);
 				rules->nb_eating--;
+				pthread_mutex_unlock(&(rules->eating_mutex));
 				break ;
 			}
 		}
+		pthread_mutex_unlock(&(rules->eating_mutex));
 		usleep(rules->time_to_sleep * 1000);
 		// Thinking
 		if (timestamp(*philo, rules, 4))
@@ -201,7 +204,7 @@ void	*monitor(void *args)
 int	start_simulation(t_philo *philos, t_rules *rules)
 {
 	int	i;
-	t_args	*args = malloc(sizeof(t_args));
+	t_args	*args;
 
 	i = 0;
 	while (i < rules->nb_philo)
@@ -216,17 +219,17 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 		i++;
 	}
 	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
-		return (free(args), 1);
+		return (1);
 	i = 0;
 	while (i < rules->nb_philo)
 	{
 		if (pthread_join(philos[i].t_id, NULL))
-			return (free(args), 1);
+			return (1);
 		i++;
 	}
 	if (pthread_join(rules->t_monitor, NULL))
-		return (free(args), 1);
+		return (1);
 	if (rules->error_flag)
-		return (free(args), 1);
-	return (free(args), 0);
+		return (1);
+	return (0);
 }
