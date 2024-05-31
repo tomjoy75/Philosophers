@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_new.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/29 17:23:06 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/31 14:54:52 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ int	init_philos(int nb_philo, t_philo *philos, t_rules *rules)
 		philos[i].id = i + 1;
 		if (pthread_mutex_init(&(philos[i].l_fork), NULL))
 			return (clean_all(philos, i), 1);
+	//	if (pthread_mutex_init(&(philos[i].lock), NULL))
+	//		return (clean_all(philos, i), 1);
 		philos[i].l_locked = 0;
 		if (gettimeofday(&(philos[i].last_eat), NULL))
 			return (clean_all(philos, nb_philo), 1);
@@ -59,6 +61,8 @@ int	init_philos(int nb_philo, t_philo *philos, t_rules *rules)
 int	main(int argc, char **argv)
 {
 	t_rules	rules;
+	
+	memset(&rules, 0, sizeof(t_rules));
 	if (parse_input(&rules, argc, argv))
 		return (1);
 	printf("value of nb_philo in main after parse_input : %d\n", rules.nb_philo);

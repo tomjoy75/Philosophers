@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/30 01:18:57 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/05/31 15:17:15 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ typedef struct s_philo
 {
 	int				id;
 	pthread_t		t_id;
+	//pthread_mutex_t	lock;
 	pthread_mutex_t	l_fork;
 	int				l_locked;
 	pthread_mutex_t	*r_fork;
@@ -48,8 +49,8 @@ typedef struct s_philo
 typedef struct s_rules
 {
 	pthread_t		t_monitor;
-	pthread_mutex_t		print_mutex;
-	pthread_mutex_t		eating_mutex;
+	pthread_mutex_t		global_mutex;
+//	pthread_mutex_t		eating_mutex;
 	int				nb_philo;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -75,7 +76,7 @@ int	error_exit(const char *error);
 void	*error_exit_NULL(const char *error);
 int	parse_input(t_rules *rules, int argc, char **argv);
 void	clean_all(t_philo *philos, int n_mutex);
-int	timestamp(t_philo philo, t_rules *rules, int state);
+int	timestamp(t_philo *philo, t_rules *rules, int state);
 int	start_simulation(t_philo *philos, t_rules *rules);
 
 #endif

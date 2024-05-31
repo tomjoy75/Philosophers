@@ -6,7 +6,7 @@
 #    By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/11 15:58:40 by tjoyeux           #+#    #+#              #
-#    Updated: 2024/05/23 16:39:14 by tjoyeux          ###   ########.fr        #
+#    Updated: 2024/05/31 14:40:29 by joyeux           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@
 NAME 		= philo
 
 CC		= gcc
-CFLAGS		= -Wall -Werror -Wextra -g3
+CFLAGS		= -Wall -Werror -Wextra -g3 
 LDFLAGS		= -pthread
 RM		= rm -f
 
@@ -53,7 +53,7 @@ clean :
 	@echo "$(MAGENTA)$(BOLD)Cleaning: $(RESET)$(BLUE)$(ITALIC)$(FLAG_FILE)$(RESET)"
 	$(RM) .build_started
 	@echo "$(MAGENTA)$(BOLD)Cleaning: $(RESET)$(BLUE)$(ITALIC)$(MLX_PATH)*.o$(RESET)"
-	make clean -C $(LIBFT_PATH)
+#	make clean -C $(LIBFT_PATH)
 
 fclean : clean
 	@echo "$(MAGENTA)$(BOLD)Cleaning: $(RESET)$(BLUE)$(ITALIC)$(NAME)$(RESET)"
