@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 00:41:30 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/01 01:30:10 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,12 +115,24 @@ static void	*routine(void *args)
 			return(rules->error_flag = 1, NULL);
 		}
 		usleep(rules->time_to_eat * 1000);
-		pthread_mutex_lock(&(philo->l_fork));
-		philo->l_locked = 0;
-		pthread_mutex_unlock(&(philo->l_fork));
-		pthread_mutex_lock(philo->r_fork);
-		*philo->r_locked = 0;
-		pthread_mutex_unlock(philo->r_fork);
+		if (philo->id % 2 == 0)
+		{
+			pthread_mutex_lock(&(philo->l_fork));
+			pthread_mutex_lock(philo->r_fork);
+			philo->l_locked = 0;
+			*philo->r_locked = 0;
+			pthread_mutex_unlock(philo->r_fork);
+			pthread_mutex_unlock(&(philo->l_fork));
+		}
+		else
+		{
+			pthread_mutex_lock(philo->r_fork);
+			pthread_mutex_lock(&(philo->l_fork));
+			*philo->r_locked = 0;
+			philo->l_locked = 0;
+			pthread_mutex_unlock(&(philo->l_fork));
+			pthread_mutex_unlock(philo->r_fork);
+		}
 		// Sleeping
 		if (timestamp(philo, rules, 3))
 			return(rules->error_flag = 1, NULL);
@@ -151,14 +163,36 @@ static void	*routine(void *args)
 //			printf ("Philo %d Activate thinking time : %d\n", philo->id, (rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) / 3);
 			usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) * 1000 / 2);//TODO:Cas retour negatif
 		}
-		pthread_mutex_lock(&(philo->l_fork));
-		while (philo->l_locked || *philo->r_locked)
+		if (philo->id % 2 == 0)
 		{
-			pthread_mutex_unlock(&(philo->l_fork));
-			usleep(100);
 			pthread_mutex_lock(&(philo->l_fork));
+			pthread_mutex_lock(philo->r_fork);
+			while (philo->l_locked || *philo->r_locked)
+			{
+				pthread_mutex_unlock(philo->r_fork);
+				pthread_mutex_unlock(&(philo->l_fork));
+				usleep(100);
+				pthread_mutex_lock(&(philo->l_fork));
+				pthread_mutex_lock(philo->r_fork);
+			}
+			pthread_mutex_unlock(philo->r_fork);
+			pthread_mutex_unlock(&(philo->l_fork));
 		}
-		pthread_mutex_unlock(&(philo->l_fork));
+		else
+		{
+			pthread_mutex_lock(philo->r_fork);
+			pthread_mutex_lock(&(philo->l_fork));
+			while (*philo->r_locked || philo->l_locked)
+			{
+				pthread_mutex_unlock(&(philo->l_fork));
+				pthread_mutex_unlock(philo->r_fork);
+				usleep(100);
+				pthread_mutex_lock(philo->r_fork);
+				pthread_mutex_lock(&(philo->l_fork));
+			}
+			pthread_mutex_unlock(&(philo->l_fork));
+			pthread_mutex_unlock(philo->r_fork);
+		}
 	}
 	free(args);
 	return (NULL);
