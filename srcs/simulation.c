@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simulation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 15:22:00 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/01 18:42:05 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ static int	lock_even_philo(t_philo *philo, t_rules *rules)
 	}
 	philo->l_locked = 1;
 	pthread_mutex_unlock(&(philo->l_fork));
-	// Take a fork
 	if (timestamp(philo, rules, 1))
 		return (1);
 	pthread_mutex_lock(philo->r_fork);
@@ -55,7 +54,6 @@ static int	lock_odd_philo(t_philo *philo, t_rules *rules)
 	}
 	*philo->r_locked = 1;
 	pthread_mutex_unlock(philo->r_fork);
-	// Take a fork
 	if (timestamp(philo, rules, 1))
 		return (1) ;
 	pthread_mutex_lock(&(philo->l_fork));
@@ -76,8 +74,6 @@ static void	*routine(void *args)
 	t_rules	*rules = ((t_args *)args)->rules;
 	if (philo->id % 2 == 0)
 		usleep(40 * rules->nb_philo);
-//	while (rules->nb_eating > 0)
-//	while (philo->meal < rules->nb_of_meals || rules->nb_of_meals == -2) 
 	while (1)
 	{
 		if (philo->id % 2 == 0)
@@ -91,13 +87,6 @@ static void	*routine(void *args)
 				return(rules->error_flag = 1, NULL);
 		}
 		//Eating 
-		// pthread_mutex_lock(&(philo->l_fork));
-		// philo->l_locked = 1;
-		// pthread_mutex_unlock(&(philo->l_fork));
-		// pthread_mutex_lock(philo->r_fork);
-		// *philo->r_locked = 1;
-		// pthread_mutex_unlock(philo->r_fork);
-		
 		pthread_mutex_lock(&(rules->global_mutex));
 //		printf("Thread %d: Locked global mutex\n", philo->id);
 		if (gettimeofday(&(philo->last_eat), NULL))
@@ -263,7 +252,7 @@ void	*monitor(void *args)
 	return (NULL);
 }
 
-// Create 2 threads by philosoopher, 1 for the simulation, and 1 for stopping it(die or everybody have eaten)
+// Create 1 threads by philosoopher for the simulation, and 1 for stopping it(die or everybody have eaten)
 int	start_simulation(t_philo *philos, t_rules *rules)
 {
 	int	i;
@@ -272,8 +261,6 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 	i = 0;
 	while (i < rules->nb_philo)
 	{
-//		if (philos[i].id % 2 == 1)
-//			usleep(100);
 		args = malloc(sizeof(t_args));
 		if (!args)
 			return (1);
@@ -285,16 +272,11 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 	}
 	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
 		return (1);
-	i = 0;
-	while (i < rules->nb_philo)
-	{
+	i = -1;
+	while (++i < rules->nb_philo)
 		if (pthread_join(philos[i].t_id, NULL))
 			return (1);
-		i++;
-	}
 	if (pthread_join(rules->t_monitor, NULL))
 		return (1);
-	if (rules->error_flag)
-		return (1);
-	return (0);
+	return (rules->error_flag);
 }

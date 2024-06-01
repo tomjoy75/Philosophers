@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 16:54:56 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/01 18:24:20 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	error_exit(const char *error)
 {
 	printf(RED"Error :\n\t"ITALIC"%s\n"RESET, error);
-	return (-1);
+	return (1);
 }
 
 void	*error_exit_null(const char *error)

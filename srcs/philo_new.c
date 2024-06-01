@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 17:01:01 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/01 18:18:25 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,10 @@ int	main(int argc, char **argv)
 {
 	t_rules	rules;
 
+	if (argc < 5 || argc > 6)
+		return (error_exit("Should be in the form :\n\t\e[0;3m./philo "
+				"number_of_philosophers time_to_die time_to_eat time_to_sleep "
+				"[number_of_times_each_philosopher_must_eat]\n"));
 	memset(&rules, 0, sizeof(t_rules));
 	if (parse_input(&rules, argc, argv))
 		return (1);

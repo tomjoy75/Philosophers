@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 16:53:01 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/01 18:18:12 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,6 @@ int	ft_atol(char *str)
 // Return value: 0 in case of error
 int	parse_input(t_rules *rules, int argc, char **argv)
 {
-	if (argc < 5 || argc > 6)
-		return (error_exit("Should be in the form :\n\t\e[0;3m./philo "
-				"number_of_philosophers time_to_die time_to_eat time_to_sleep "
-				"[number_of_times_each_philosopher_must_eat]\n"));
 	rules->nb_philo = ft_atol(argv[1]);
 	rules->nb_eating = rules->nb_philo;
 	rules->time_to_die = ft_atol(argv[2]);
@@ -91,14 +87,14 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 	if (rules->nb_philo == -1 || rules->time_to_die == -1
 		|| rules->time_to_eat == -1 || rules->time_to_sleep == -1
 		|| rules->nb_of_meals == -1)
-		return (-1);
+		return (1);
 	if (!rules->nb_philo)
 		return (error_exit("At least 1 philosopher\n"));
 //	rules->finished = 0;
 	gettimeofday(&(rules->tv_beg), NULL); //A proteger
-	rules->last_eat_max = 0;
-	if (rules->nb_philo > 1)
-		rules->priority = 2;
+//	rules->last_eat_max = 0;
+//	if (rules->nb_philo > 1)
+//		rules->priority = 2;
 	printf("value of nb_philo in parse_input : %d\n", rules->nb_philo);
 	if (pthread_mutex_init(&rules->global_mutex, NULL))
 		return (1);

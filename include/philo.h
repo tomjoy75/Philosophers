@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 16:52:10 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/01 18:13:11 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,11 @@ typedef struct s_philo
 {
 	int				id;
 	pthread_t		t_id;
-	//pthread_mutex_t	lock;
 	pthread_mutex_t	l_fork;
 	int				l_locked;
 	pthread_mutex_t	*r_fork;
 	int				*r_locked;
-	int				state;
+//	int				state;
 	int				meal;
 	struct timeval	last_eat;
 }				t_philo;
@@ -50,7 +49,6 @@ typedef struct s_rules
 {
 	pthread_t		t_monitor;
 	pthread_mutex_t		global_mutex;
-//	pthread_mutex_t		eating_mutex;
 	int				nb_philo;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -59,8 +57,8 @@ typedef struct s_rules
 	int				nb_eating;
 	int				nb_of_meals;
 	int				error_flag;
-	int				last_eat_max;
-	int				priority;
+//	int				last_eat_max;
+//	int				priority;
 	int				write_off;
 	t_philo			*philos;
 }				t_rules;
