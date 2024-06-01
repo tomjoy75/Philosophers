@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/28 11:06:23 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/01 16:52:23 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ struct s_rules
 
 int	ft_atoi(const char *nptr);
 int	error_exit(const char *error);
-void	*error_exit_NULL(const char *error);
+void	*error_exit_null(const char *error);
 int	parse_input(t_rules *rules, int argc, char **argv);
 void	clean_all(t_philo *philos, int n_mutex);
 int	timestamp(t_philo philo, t_rules *rules, int state);

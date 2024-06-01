@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 01:30:10 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/01 15:22:00 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,6 +275,8 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 //		if (philos[i].id % 2 == 1)
 //			usleep(100);
 		args = malloc(sizeof(t_args));
+		if (!args)
+			return (1);
 		args->philo = &(philos[i]);
 		args->rules = rules;
 		if (pthread_create(&(philos[i].t_id), NULL, &routine, (void *)args))

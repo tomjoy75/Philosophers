@@ -25,7 +25,7 @@ int	error_exit(const char *error)
 	return (-1);
 }
 
-void	*error_exit_NULL(const char *error)
+void	*error_exit_null(const char *error)
 {
 	printf(RED"Error :\n\t"ITALIC"%s\n"RESET, error);
 	return (NULL);

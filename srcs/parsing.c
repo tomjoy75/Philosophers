@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/05/31 14:55:51 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/01 16:53:01 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ char	*is_valid_arg(char *str)
 	if (*str == '+')
 		str++;
 	else if (*str == '-')
-		return (error_exit_NULL("Only positive values\n"));
+		return (error_exit_null("Only positive values\n"));
 	if (!is_number(*str))
-		return (error_exit_NULL("Please reformat the number\n"));
+		return (error_exit_null("Please reformat the number\n"));
 	num = str;
 	while (is_number(*str))
 	{
@@ -45,7 +45,7 @@ char	*is_valid_arg(char *str)
 		len++;
 	}
 	if (len > 10)
-		return (error_exit_NULL("Arg should't be > INT_MAX\n"));
+		return (error_exit_null("Arg should't be > INT_MAX\n"));
 	return (num);
 }
 
