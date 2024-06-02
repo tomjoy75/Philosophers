@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 00:30:29 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/03 00:59:36 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,29 +267,39 @@ void	*dead(void *args)
 	}
 	return (NULL);
 }*/
-/*
+
 void	*monitor(void *args)
 {
 	t_rules			*rules = (t_rules *)args;
 	t_philo			*philos = rules->philos;
 	// int				frequence = 100;
 	// int				time_passed;
-	// struct timeval	tv_act;
-	// int				i;
+	 struct timeval	tv_act;
+	 int				i;
 
-	(void)args;
+//	(void)args;
 	// Pour chaques philosophe :
 	// 1 . Verifier si il a mange tous les repas(necessaire??)
 	// 2 . Verifier si il est mort
-	//i = 0;
+	i = 0;
 	while (1)
 	{
-		
+		if (gettimeofday(&tv_act, NULL))
+			return (NULL);
+		if (time_passed(tv_act, philos[i].last_eat) > rules->time_to_die)
+		{
+			if (timestamp(philos + i, rules, 5))
+				return (NULL);
+			return (NULL);
+		}
+		i++;
+		if (i == rules->nb_philo)
+			i = 0;
 	}
 //	printf ("Monitoring %d philos\n", rules->nb_philo);
 //	printf ("Monitoring philos %d\n", *philos->id);
 	return (NULL);
-}*/
+}
 
 // Create 1 threads by philosoopher for the simulation,
 // and 1 for stopping it(die or everybody have eaten)
@@ -310,13 +320,13 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
-//	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
-//		return (1);
+	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
+		return (1);
 	i = -1;
 	while (++i < rules->nb_philo)
 		if (pthread_join(philos[i].t_id, NULL))
 			return (1);
-//	if (pthread_join(rules->t_monitor, NULL))
-//		return (1);
+	if (pthread_join(rules->t_monitor, NULL))
+		return (1);
 	return (rules->error_flag);
 }

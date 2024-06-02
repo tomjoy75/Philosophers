@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 00:26:26 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/03 01:01:16 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,12 @@ static char	*activity(int state)
 	else if (state == 7)
 		return ("has eaten enough");
 	return ("");
+}
+
+int	time_passed(struct timeval tv_end, struct timeval tv_beg)
+{
+	return (((tv_end.tv_sec - tv_beg.tv_sec) * 1000)
+			+ ((tv_end.tv_usec - tv_beg.tv_usec) / 1000));
 }
 
 int	timestamp(t_philo *philo, t_rules *rules, int state)
