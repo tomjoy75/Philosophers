@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simulation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 18:42:05 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/02 03:42:01 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,138 @@ static int	lock_odd_philo(t_philo *philo, t_rules *rules)
 	return (0);
 }
 
+void	free_locks(t_philo *philo)
+{
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(&(philo->l_fork));
+		pthread_mutex_lock(philo->r_fork);
+		philo->l_locked = 0;
+		*philo->r_locked = 0;
+		pthread_mutex_unlock(philo->r_fork);
+		pthread_mutex_unlock(&(philo->l_fork));
+	}
+	else
+	{
+		pthread_mutex_lock(philo->r_fork);
+		pthread_mutex_lock(&(philo->l_fork));
+		*philo->r_locked = 0;
+		philo->l_locked = 0;
+		pthread_mutex_unlock(&(philo->l_fork));
+		pthread_mutex_unlock(philo->r_fork);
+	}
+}
+
+void	*eating_time(t_philo *philo, t_rules *rules)
+{
+	pthread_mutex_lock(&(rules->global_mutex));
+//	printf("Thread %d: Locked global mutex\n", philo->id);
+	if (gettimeofday(&(philo->last_eat), NULL))
+	{
+		pthread_mutex_unlock(&(rules->global_mutex));
+//		printf("Thread %d: Unlocked global mutex due to error in gettimeofday\n", philo->id);
+		return(NULL);
+	}
+	pthread_mutex_unlock(&(rules->global_mutex));
+//	printf("Thread %d: Unlocked global mutex after updating last_eat\n", philo->id);
+	
+	if (timestamp(philo, rules, 2))
+	{
+//		pthread_mutex_unlock(&(rules->global_mutex));
+		return(NULL);
+	}
+	usleep(rules->time_to_eat * 1000);
+	free_locks(philo);
+	return ((void *)1);
+}
+
+void	*sleeping_time(t_philo *philo, t_rules *rules, int *break_flag)
+{
+	if (timestamp(philo, rules, 3))
+		return(NULL);
+	pthread_mutex_lock(&(rules->global_mutex));
+//	printf("Thread %d: Locked global mutex for meal count\n", philo->id);
+	if (rules->nb_of_meals != -2)
+	{
+		philo->meal++;
+		if (philo->meal >= rules->nb_of_meals)
+		{
+//			printf("!!!philo %d has finished the %d meal!!!\n", philo->id, philo->meal);
+			rules->nb_eating--; //TODO: Est ce que j'en ai besoin ?
+			pthread_mutex_unlock(&(rules->global_mutex));
+//			printf("Thread %d: Unlocked global mutex after decrementing nb_eating\n", philo->id);
+			*break_flag = 1;
+			return ((void *)1);
+		}
+	}
+	pthread_mutex_unlock(&(rules->global_mutex));
+//	printf("Thread %d: Unlocked global mutex after meal count\n", philo->id);
+	usleep(rules->time_to_sleep * 1000);
+	return ((void *)1);
+}
+
+void	even_time_thinking(t_philo *philo)
+{
+	pthread_mutex_lock(&(philo->l_fork));
+	pthread_mutex_lock(philo->r_fork);
+	while (*philo->r_locked || philo->l_locked)
+	{
+		pthread_mutex_unlock(philo->r_fork);
+		pthread_mutex_unlock(&(philo->l_fork));
+		usleep(100);
+		pthread_mutex_lock(&(philo->l_fork));
+		pthread_mutex_lock(philo->r_fork);
+	}
+	pthread_mutex_unlock(philo->r_fork);
+	pthread_mutex_unlock(&(philo->l_fork));
+}
+
+void	odd_time_thinking(t_philo *philo)
+{
+	pthread_mutex_lock(philo->r_fork);
+	pthread_mutex_lock(&(philo->l_fork));
+	while (*philo->r_locked || philo->l_locked)
+	{
+		pthread_mutex_unlock(&(philo->l_fork));
+		pthread_mutex_unlock(philo->r_fork);
+		usleep(100);
+		pthread_mutex_lock(philo->r_fork);
+		pthread_mutex_lock(&(philo->l_fork));
+	}
+	pthread_mutex_unlock(&(philo->l_fork));
+	pthread_mutex_unlock(philo->r_fork);
+}
+
+void	*thinking_time(t_philo *philo, t_rules *rules)
+{
+	if (timestamp(philo, rules, 4))
+		return(NULL);
+	if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
+		usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
+	else if (rules->nb_philo % 2 && rules->time_to_eat == rules->time_to_sleep)
+	{
+//			printf ("Philo %d Activate thinking time : %d\n", philo->id, (rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) / 3);
+		usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) * 1000 / 2);//TODO:Cas retour negatif
+	}
+	if (philo->id % 2 == 0)
+		even_time_thinking(philo);
+	else
+		odd_time_thinking(philo);	
+	return ((void *)1);
+}
+
 static void	*routine(void *args)
 {
-	t_philo	*philo = ((t_args *)args)->philo;
-	t_rules	*rules = ((t_args *)args)->rules;
+	t_philo	*philo;
+	t_rules	*rules;
+	int		break_flag;
+
+	break_flag = 0;
+	philo = ((t_args *)args)->philo;
+	rules = ((t_args *)args)->rules;
 	if (philo->id % 2 == 0)
 		usleep(40 * rules->nb_philo);
-	while (1)
+	while (!rules->error_flag && (philo->meal < rules->nb_of_meals || rules->nb_of_meals == -2))
 	{
 		if (philo->id % 2 == 0)
 		{
@@ -86,102 +211,14 @@ static void	*routine(void *args)
 			if (lock_odd_philo(philo, rules))
 				return(rules->error_flag = 1, NULL);
 		}
-		//Eating 
-		pthread_mutex_lock(&(rules->global_mutex));
-//		printf("Thread %d: Locked global mutex\n", philo->id);
-		if (gettimeofday(&(philo->last_eat), NULL))
-		{
-			pthread_mutex_unlock(&(rules->global_mutex));
-//			printf("Thread %d: Unlocked global mutex due to error in gettimeofday\n", philo->id);
+		if (!eating_time(philo, rules))
 			return(rules->error_flag = 1, NULL);
-		}
-		pthread_mutex_unlock(&(rules->global_mutex));
-//		printf("Thread %d: Unlocked global mutex after updating last_eat\n", philo->id);
-		
-		if (timestamp(philo, rules, 2))
-		{
-//			pthread_mutex_unlock(&(rules->global_mutex));
+		if (!sleeping_time(philo, rules, &break_flag))
 			return(rules->error_flag = 1, NULL);
-		}
-		usleep(rules->time_to_eat * 1000);
-		if (philo->id % 2 == 0)
-		{
-			pthread_mutex_lock(&(philo->l_fork));
-			pthread_mutex_lock(philo->r_fork);
-			philo->l_locked = 0;
-			*philo->r_locked = 0;
-			pthread_mutex_unlock(philo->r_fork);
-			pthread_mutex_unlock(&(philo->l_fork));
-		}
-		else
-		{
-			pthread_mutex_lock(philo->r_fork);
-			pthread_mutex_lock(&(philo->l_fork));
-			*philo->r_locked = 0;
-			philo->l_locked = 0;
-			pthread_mutex_unlock(&(philo->l_fork));
-			pthread_mutex_unlock(philo->r_fork);
-		}
-		// Sleeping
-		if (timestamp(philo, rules, 3))
+		if (break_flag)
+			break;
+		if (!thinking_time(philo, rules))
 			return(rules->error_flag = 1, NULL);
-		pthread_mutex_lock(&(rules->global_mutex));
-//		printf("Thread %d: Locked global mutex for meal count\n", philo->id);
-		if (rules->nb_of_meals != -2)
-		{
-			philo->meal++;
-			if (philo->meal >= rules->nb_of_meals)
-			{
-//				printf("!!!philo %d has finished the %d meal!!!\n", philo->id, philo->meal);
-				rules->nb_eating--;
-				pthread_mutex_unlock(&(rules->global_mutex));
-//				printf("Thread %d: Unlocked global mutex after decrementing nb_eating\n", philo->id);
-				break ;
-			}
-		}
-		pthread_mutex_unlock(&(rules->global_mutex));
-//		printf("Thread %d: Unlocked global mutex after meal count\n", philo->id);
-		usleep(rules->time_to_sleep * 1000);
-		// Thinking
-		if (timestamp(philo, rules, 4))
-			return(rules->error_flag = 1, NULL);
-		if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
-			usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
-		else if (rules->nb_philo % 2 && rules->time_to_eat == rules->time_to_sleep)
-		{
-//			printf ("Philo %d Activate thinking time : %d\n", philo->id, (rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) / 3);
-			usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) * 1000 / 2);//TODO:Cas retour negatif
-		}
-		if (philo->id % 2 == 0)
-		{
-			pthread_mutex_lock(&(philo->l_fork));
-			pthread_mutex_lock(philo->r_fork);
-			while (philo->l_locked || *philo->r_locked)
-			{
-				pthread_mutex_unlock(philo->r_fork);
-				pthread_mutex_unlock(&(philo->l_fork));
-				usleep(100);
-				pthread_mutex_lock(&(philo->l_fork));
-				pthread_mutex_lock(philo->r_fork);
-			}
-			pthread_mutex_unlock(philo->r_fork);
-			pthread_mutex_unlock(&(philo->l_fork));
-		}
-		else
-		{
-			pthread_mutex_lock(philo->r_fork);
-			pthread_mutex_lock(&(philo->l_fork));
-			while (*philo->r_locked || philo->l_locked)
-			{
-				pthread_mutex_unlock(&(philo->l_fork));
-				pthread_mutex_unlock(philo->r_fork);
-				usleep(100);
-				pthread_mutex_lock(philo->r_fork);
-				pthread_mutex_lock(&(philo->l_fork));
-			}
-			pthread_mutex_unlock(&(philo->l_fork));
-			pthread_mutex_unlock(philo->r_fork);
-		}
 	}
 	free(args);
 	return (NULL);
