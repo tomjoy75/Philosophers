@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 18:24:20 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/03 00:26:26 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ static char	*activity(int state)
 		return ("died");
 	else if (state == 6)
 		return ("___check dying___");
+	else if (state == 7)
+		return ("has eaten enough");
 	return ("");
 }
 
@@ -66,7 +68,10 @@ int	timestamp(t_philo *philo, t_rules *rules, int state)
 	pthread_mutex_lock(&rules->global_mutex);
 	if (!rules->write_off)
 	{
-		printf("%d\t%d %s\n", time_passed, philo->id, activity(state));
+		if (state == 7)
+			printf("%d\t%d %s (%d times)\n", time_passed, philo->id, activity(state), philo->meal);
+		else
+			printf("%d\t%d %s\n", time_passed, philo->id, activity(state));
 		if (state == 5)
 			rules->write_off = 1;
 	}

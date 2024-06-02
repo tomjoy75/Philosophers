@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/02 03:42:01 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/03 00:30:29 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static int	check_priority(t_philo *philo, t_rules *rules)
 static int	lock_even_philo(t_philo *philo, t_rules *rules)
 {
 	pthread_mutex_lock(&(philo->l_fork));
-	while (philo->l_locked /*|| !check_priority(philo, rules)*/)
+	while (philo->l_locked)
 	{
 		pthread_mutex_unlock(&(philo->l_fork));
 		usleep(100);
@@ -32,7 +32,7 @@ static int	lock_even_philo(t_philo *philo, t_rules *rules)
 	if (timestamp(philo, rules, 1))
 		return (1);
 	pthread_mutex_lock(philo->r_fork);
-	while (*philo->r_locked /*|| !check_priority(philo, rules)*/)
+	while (*philo->r_locked)
 	{
 		pthread_mutex_unlock(philo->r_fork);
 		usleep(100);
@@ -46,7 +46,7 @@ static int	lock_even_philo(t_philo *philo, t_rules *rules)
 static int	lock_odd_philo(t_philo *philo, t_rules *rules)
 {
 	pthread_mutex_lock(philo->r_fork);
-	while (*philo->r_locked /*|| !check_priority(philo, rules)*/)
+	while (*philo->r_locked)
 	{
 		pthread_mutex_unlock(philo->r_fork);
 		usleep(100);
@@ -55,9 +55,9 @@ static int	lock_odd_philo(t_philo *philo, t_rules *rules)
 	*philo->r_locked = 1;
 	pthread_mutex_unlock(philo->r_fork);
 	if (timestamp(philo, rules, 1))
-		return (1) ;
+		return (1);
 	pthread_mutex_lock(&(philo->l_fork));
-	while (philo->l_locked /*|| !check_priority(philo, rules)*/)
+	while (philo->l_locked)
 	{
 		pthread_mutex_unlock(&(philo->l_fork));
 		usleep(100);
@@ -93,20 +93,15 @@ void	free_locks(t_philo *philo)
 void	*eating_time(t_philo *philo, t_rules *rules)
 {
 	pthread_mutex_lock(&(rules->global_mutex));
-//	printf("Thread %d: Locked global mutex\n", philo->id);
 	if (gettimeofday(&(philo->last_eat), NULL))
 	{
 		pthread_mutex_unlock(&(rules->global_mutex));
-//		printf("Thread %d: Unlocked global mutex due to error in gettimeofday\n", philo->id);
-		return(NULL);
+		return (NULL);
 	}
 	pthread_mutex_unlock(&(rules->global_mutex));
-//	printf("Thread %d: Unlocked global mutex after updating last_eat\n", philo->id);
-	
 	if (timestamp(philo, rules, 2))
 	{
-//		pthread_mutex_unlock(&(rules->global_mutex));
-		return(NULL);
+		return (NULL);
 	}
 	usleep(rules->time_to_eat * 1000);
 	free_locks(philo);
@@ -115,25 +110,24 @@ void	*eating_time(t_philo *philo, t_rules *rules)
 
 void	*sleeping_time(t_philo *philo, t_rules *rules, int *break_flag)
 {
-	if (timestamp(philo, rules, 3))
-		return(NULL);
 	pthread_mutex_lock(&(rules->global_mutex));
-//	printf("Thread %d: Locked global mutex for meal count\n", philo->id);
 	if (rules->nb_of_meals != -2)
 	{
 		philo->meal++;
 		if (philo->meal >= rules->nb_of_meals)
 		{
-//			printf("!!!philo %d has finished the %d meal!!!\n", philo->id, philo->meal);
 			rules->nb_eating--; //TODO: Est ce que j'en ai besoin ?
-			pthread_mutex_unlock(&(rules->global_mutex));
-//			printf("Thread %d: Unlocked global mutex after decrementing nb_eating\n", philo->id);
+//			printf("Philo %d has eaten %d times\n", philo->id, philo->meal);
 			*break_flag = 1;
+			pthread_mutex_unlock(&(rules->global_mutex));
+			if (timestamp(philo, rules, 7))
+				return (NULL);
 			return ((void *)1);
 		}
 	}
 	pthread_mutex_unlock(&(rules->global_mutex));
-//	printf("Thread %d: Unlocked global mutex after meal count\n", philo->id);
+	if (timestamp(philo, rules, 3))
+		return (NULL);
 	usleep(rules->time_to_sleep * 1000);
 	return ((void *)1);
 }
@@ -170,22 +164,49 @@ void	odd_time_thinking(t_philo *philo)
 	pthread_mutex_unlock(philo->r_fork);
 }
 
+//TODO: Checker si on doit differencier > et = .
+//TODO:Cas retour negatif sur le deuxieme usleep
 void	*thinking_time(t_philo *philo, t_rules *rules)
 {
 	if (timestamp(philo, rules, 4))
-		return(NULL);
+		return (NULL);
 	if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
 		usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
 	else if (rules->nb_philo % 2 && rules->time_to_eat == rules->time_to_sleep)
-	{
-//			printf ("Philo %d Activate thinking time : %d\n", philo->id, (rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) / 3);
-		usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep) * 1000 / 2);//TODO:Cas retour negatif
-	}
+		usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep)
+			* 1000 / 2);
 	if (philo->id % 2 == 0)
 		even_time_thinking(philo);
 	else
-		odd_time_thinking(philo);	
+		odd_time_thinking(philo);
 	return ((void *)1);
+}
+
+int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
+{
+	while (!rules->error_flag && (philo->meal < rules->nb_of_meals
+			|| rules->nb_of_meals == -2))
+	{
+		if (philo->id % 2 == 0)
+		{
+			if (lock_even_philo(philo, rules))
+				return (1);
+		}
+		else
+		{
+			if (lock_odd_philo(philo, rules))
+				return (1);
+		}
+		if (!eating_time(philo, rules))
+			return (1);
+		if (!sleeping_time(philo, rules, break_flag))
+			return (1);
+		if (*break_flag)
+			return (0);
+		if (!thinking_time(philo, rules))
+			return (1);
+	}
+	return (0);
 }
 
 static void	*routine(void *args)
@@ -199,27 +220,8 @@ static void	*routine(void *args)
 	rules = ((t_args *)args)->rules;
 	if (philo->id % 2 == 0)
 		usleep(40 * rules->nb_philo);
-	while (!rules->error_flag && (philo->meal < rules->nb_of_meals || rules->nb_of_meals == -2))
-	{
-		if (philo->id % 2 == 0)
-		{
-			if (lock_even_philo(philo, rules))
-				return(rules->error_flag = 1, NULL);
-		}
-		else
-		{
-			if (lock_odd_philo(philo, rules))
-				return(rules->error_flag = 1, NULL);
-		}
-		if (!eating_time(philo, rules))
-			return(rules->error_flag = 1, NULL);
-		if (!sleeping_time(philo, rules, &break_flag))
-			return(rules->error_flag = 1, NULL);
-		if (break_flag)
-			break;
-		if (!thinking_time(philo, rules))
-			return(rules->error_flag = 1, NULL);
-	}
+	if (run_routine(philo, rules, &break_flag))
+		rules->error_flag = 1;
 	free(args);
 	return (NULL);
 }
@@ -265,11 +267,11 @@ void	*dead(void *args)
 	}
 	return (NULL);
 }*/
-
+/*
 void	*monitor(void *args)
 {
-//	t_rules			*rules = (t_rules *)args;
-//	t_philo			*philos = rules->philos;
+	t_rules			*rules = (t_rules *)args;
+	t_philo			*philos = rules->philos;
 	// int				frequence = 100;
 	// int				time_passed;
 	// struct timeval	tv_act;
@@ -277,22 +279,23 @@ void	*monitor(void *args)
 
 	(void)args;
 	// Pour chaques philosophe :
-	// 1 . Verifier si il a mange tous les repas
+	// 1 . Verifier si il a mange tous les repas(necessaire??)
 	// 2 . Verifier si il est mort
 	//i = 0;
-/*	while (1)
+	while (1)
 	{
 		
-	}*/
+	}
 //	printf ("Monitoring %d philos\n", rules->nb_philo);
 //	printf ("Monitoring philos %d\n", *philos->id);
 	return (NULL);
-}
+}*/
 
-// Create 1 threads by philosoopher for the simulation, and 1 for stopping it(die or everybody have eaten)
+// Create 1 threads by philosoopher for the simulation,
+// and 1 for stopping it(die or everybody have eaten)
 int	start_simulation(t_philo *philos, t_rules *rules)
 {
-	int	i;
+	int		i;
 	t_args	*args;
 
 	i = 0;
@@ -307,13 +310,13 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
-	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
-		return (1);
+//	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
+//		return (1);
 	i = -1;
 	while (++i < rules->nb_philo)
 		if (pthread_join(philos[i].t_id, NULL))
 			return (1);
-	if (pthread_join(rules->t_monitor, NULL))
-		return (1);
+//	if (pthread_join(rules->t_monitor, NULL))
+//		return (1);
 	return (rules->error_flag);
 }
