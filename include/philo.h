@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 01:01:55 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/03 13:10:05 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ typedef struct s_rules
 //	int				last_eat_max;
 //	int				priority;
 	int				write_off;
+	int				simulation_finished;
 	t_philo			*philos;
 }				t_rules;
 

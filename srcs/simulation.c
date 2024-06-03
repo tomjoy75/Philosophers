@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 00:59:36 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/03 16:59:39 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,10 +166,13 @@ void	odd_time_thinking(t_philo *philo)
 
 //TODO: Checker si on doit differencier > et = .
 //TODO:Cas retour negatif sur le deuxieme usleep
-void	*thinking_time(t_philo *philo, t_rules *rules)
+void	thinking_time(t_philo *philo, t_rules *rules)
 {
 	if (timestamp(philo, rules, 4))
-		return (NULL);
+	{
+		rules->error_flag = 1;
+		return ;
+	}
 	if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
 		usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
 	else if (rules->nb_philo % 2 && rules->time_to_eat == rules->time_to_sleep)
@@ -179,13 +182,13 @@ void	*thinking_time(t_philo *philo, t_rules *rules)
 		even_time_thinking(philo);
 	else
 		odd_time_thinking(philo);
-	return ((void *)1);
+//	return ((void *)1);
 }
 
 int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
 {
-	while (!rules->error_flag && (philo->meal < rules->nb_of_meals
-			|| rules->nb_of_meals == -2))
+	while (!rules->simulation_finished && !rules->error_flag && (philo->meal
+			< rules->nb_of_meals || rules->nb_of_meals == -2))
 	{
 		if (philo->id % 2 == 0)
 		{
@@ -197,14 +200,20 @@ int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
 			if (lock_odd_philo(philo, rules))
 				return (1);
 		}
+		if (rules->simulation_finished)
+			return (0);
 		if (!eating_time(philo, rules))
 			return (1);
+		if (rules->simulation_finished)
+			return (0);
 		if (!sleeping_time(philo, rules, break_flag))
 			return (1);
-		if (*break_flag)
+		if (*break_flag || rules->simulation_finished)
 			return (0);
-		if (!thinking_time(philo, rules))
-			return (1);
+//		if (!thinking_time(philo, rules))
+//			return (1);
+		
+		thinking_time(philo, rules);
 	}
 	return (0);
 }
@@ -268,6 +277,7 @@ void	*dead(void *args)
 	return (NULL);
 }*/
 
+//TODO: Checker boucle infinie si pesonne ne meurt(tout le monde a mange)
 void	*monitor(void *args)
 {
 	t_rules			*rules = (t_rules *)args;
@@ -284,13 +294,20 @@ void	*monitor(void *args)
 	i = 0;
 	while (1)
 	{
-		if (gettimeofday(&tv_act, NULL))
-			return (NULL);
-		if (time_passed(tv_act, philos[i].last_eat) > rules->time_to_die)
-		{
-			if (timestamp(philos + i, rules, 5))
+		if (rules->nb_of_meals == -2 || philos[i].meal < rules->nb_of_meals)
+		{	
+			if (gettimeofday(&tv_act, NULL))
 				return (NULL);
-			return (NULL);
+			pthread_mutex_lock(&(rules->global_mutex));
+			if (time_passed(tv_act, philos[i].last_eat) > rules->time_to_die)
+			{
+				pthread_mutex_unlock(&(rules->global_mutex));
+				if (timestamp(philos + i, rules, 5))
+					return (NULL);
+				rules->simulation_finished++;
+				return (NULL);
+			}
+			pthread_mutex_unlock(&(rules->global_mutex));
 		}
 		i++;
 		if (i == rules->nb_philo)
