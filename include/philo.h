@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 13:10:05 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/04 01:37:50 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ typedef struct s_rules
 //	int				priority;
 	int				write_off;
 	int				simulation_finished;
+//	int				monitor_thread_running;
 	t_philo			*philos;
 }				t_rules;
 

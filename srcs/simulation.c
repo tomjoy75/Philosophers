@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 16:59:39 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/04 01:44:36 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,11 +185,25 @@ void	thinking_time(t_philo *philo, t_rules *rules)
 //	return ((void *)1);
 }
 
+int	mtx_check_ending(t_rules *rules)
+{
+	pthread_mutex_lock(&(rules->global_mutex));
+	if (rules->simulation_finished)
+	{
+		pthread_mutex_unlock(&(rules->global_mutex));
+		return (1);
+	}
+	pthread_mutex_unlock(&(rules->global_mutex));
+	return (0);
+}
+
 int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
 {
+	pthread_mutex_lock(&(rules->global_mutex));
 	while (!rules->simulation_finished && !rules->error_flag && (philo->meal
 			< rules->nb_of_meals || rules->nb_of_meals == -2))
-	{
+	{		
+		pthread_mutex_unlock(&(rules->global_mutex));
 		if (philo->id % 2 == 0)
 		{
 			if (lock_even_philo(philo, rules))
@@ -200,11 +214,11 @@ int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
 			if (lock_odd_philo(philo, rules))
 				return (1);
 		}
-		if (rules->simulation_finished)
+		if (mtx_check_ending(rules))
 			return (0);
 		if (!eating_time(philo, rules))
 			return (1);
-		if (rules->simulation_finished)
+		if (mtx_check_ending(rules))
 			return (0);
 		if (!sleeping_time(philo, rules, break_flag))
 			return (1);
@@ -214,7 +228,9 @@ int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
 //			return (1);
 		
 		thinking_time(philo, rules);
+		pthread_mutex_lock(&(rules->global_mutex));
 	}
+	pthread_mutex_unlock(&(rules->global_mutex));
 	return (0);
 }
 
@@ -230,7 +246,11 @@ static void	*routine(void *args)
 	if (philo->id % 2 == 0)
 		usleep(40 * rules->nb_philo);
 	if (run_routine(philo, rules, &break_flag))
+	{
+		pthread_mutex_lock(&(rules->global_mutex));
 		rules->error_flag = 1;
+		pthread_mutex_unlock(&(rules->global_mutex));
+	}
 	free(args);
 	return (NULL);
 }
@@ -292,7 +312,7 @@ void	*monitor(void *args)
 	// 1 . Verifier si il a mange tous les repas(necessaire??)
 	// 2 . Verifier si il est mort
 	i = 0;
-	while (1)
+	while (rules->nb_eating > 0 || rules->nb_of_meals == -2)
 	{
 		if (rules->nb_of_meals == -2 || philos[i].meal < rules->nb_of_meals)
 		{	
@@ -301,10 +321,10 @@ void	*monitor(void *args)
 			pthread_mutex_lock(&(rules->global_mutex));
 			if (time_passed(tv_act, philos[i].last_eat) > rules->time_to_die)
 			{
+				rules->simulation_finished++;
 				pthread_mutex_unlock(&(rules->global_mutex));
 				if (timestamp(philos + i, rules, 5))
 					return (NULL);
-				rules->simulation_finished++;
 				return (NULL);
 			}
 			pthread_mutex_unlock(&(rules->global_mutex));
@@ -315,6 +335,7 @@ void	*monitor(void *args)
 	}
 //	printf ("Monitoring %d philos\n", rules->nb_philo);
 //	printf ("Monitoring philos %d\n", *philos->id);
+//	rules->monitor_thread_running = 0;
 	return (NULL);
 }
 
@@ -337,13 +358,22 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
+//	rules->monitor_thread_running = 1;	
 	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
+		return (1);
+	printf("Monitor thread created\n");
+	if (pthread_join(rules->t_monitor, NULL))
 		return (1);
 	i = -1;
 	while (++i < rules->nb_philo)
+	{
+		printf("Joining philosopher %d thread\n", i + 1);
 		if (pthread_join(philos[i].t_id, NULL))
+		{
+			printf("Failed to join philosopher %d thread\n", i + 1);
 			return (1);
-	if (pthread_join(rules->t_monitor, NULL))
-		return (1);
+		}
+		printf("Philosopher %d thread joined\n", i + 1);
+	}
 	return (rules->error_flag);
 }
