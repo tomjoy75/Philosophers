@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/03 01:01:16 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/04 10:54:53 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,21 @@ int	time_passed(struct timeval tv_end, struct timeval tv_beg)
 	return (((tv_end.tv_sec - tv_beg.tv_sec) * 1000)
 			+ ((tv_end.tv_usec - tv_beg.tv_usec) / 1000));
 }
+
+void	mtx_printf_noarg(t_rules *rules, char *str)
+{
+	pthread_mutex_lock(&rules->global_mutex);
+	printf("%s\n", str);
+	pthread_mutex_unlock(&rules->global_mutex);
+}
+
+void	mtx_printf_arg(t_rules *rules, char *str, int i)
+{
+	pthread_mutex_lock(&rules->global_mutex);
+	printf("%s\t[%i]\n", str, i);
+	pthread_mutex_unlock(&rules->global_mutex);
+}
+
 
 int	timestamp(t_philo *philo, t_rules *rules, int state)
 {

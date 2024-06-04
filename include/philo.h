@@ -6,7 +6,7 @@
 /*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/04 01:37:50 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/04 10:48:23 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,5 +79,7 @@ void	clean_all(t_philo *philos, int n_mutex);
 int	time_passed(struct timeval tv_end, struct timeval tv_beg);
 int	timestamp(t_philo *philo, t_rules *rules, int state);
 int	start_simulation(t_philo *philos, t_rules *rules);
+void	mtx_printf_noarg(t_rules *rules, char *str);
+void	mtx_printf_arg(t_rules *rules, char *str, int i);
 
 #endif
