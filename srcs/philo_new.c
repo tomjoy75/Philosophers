@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_new.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 18:18:25 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/05 00:30:20 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	main(int argc, char **argv)
 	memset(&rules, 0, sizeof(t_rules));
 	if (parse_input(&rules, argc, argv))
 		return (1);
-	printf("value of nb_philo in main after parse_input : %d\n", rules.nb_philo);
+//	printf("value of nb_philo in main after parse_input : %d\n", rules.nb_philo);
 	rules.philos = malloc(sizeof(t_philo) * rules.nb_philo);
 	if (!rules.philos)
 		return (1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/01 18:18:12 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/05 00:30:08 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 //	rules->last_eat_max = 0;
 //	if (rules->nb_philo > 1)
 //		rules->priority = 2;
-	printf("value of nb_philo in parse_input : %d\n", rules->nb_philo);
+//	printf("value of nb_philo in parse_input : %d\n", rules->nb_philo);
 	if (pthread_mutex_init(&rules->global_mutex, NULL))
 		return (1);
 	// if (pthread_mutex_init(&rules->eating_mutex, NULL))
