@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simulation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 00:29:34 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/05 15:36:08 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,9 +176,9 @@ void	thinking_time(t_philo *philo, t_rules *rules)
 		rules->error_flag = 1;
 		return ;
 	}
-	if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
-		usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
-	else if (rules->nb_philo % 2 && rules->time_to_eat == rules->time_to_sleep)
+//	if (rules->nb_philo % 2 && rules->time_to_eat > rules->time_to_sleep)
+//		usleep((rules->time_to_eat - rules->time_to_sleep) * 1000);
+	if (rules->nb_philo % 2 && rules->time_to_eat >= rules->time_to_sleep)
 		usleep ((rules->time_to_die - rules->time_to_eat - rules->time_to_sleep)
 			* 1000 / 2);
 	if (philo->id % 2 == 0)
@@ -329,7 +329,7 @@ void	*monitor(void *args)
 			if (gettimeofday(&tv_act, NULL))
 				return (NULL);
 			pthread_mutex_lock(&(rules->global_mutex));
-			if (time_passed(tv_act, philos[i].last_eat) > rules->time_to_die)
+			if (time_passed(tv_act, philos[i].last_eat) >= rules->time_to_die)
 			{
 				rules->simulation_finished++;
 				pthread_mutex_unlock(&(rules->global_mutex));
@@ -342,7 +342,7 @@ void	*monitor(void *args)
 		i++;
 		if (i == rules->nb_philo)
 			i = 0;
-		usleep (100);
+//		usleep (200 / rules->nb_philo);
 		pthread_mutex_lock(&(rules->global_mutex));
 	}
 	pthread_mutex_unlock(&(rules->global_mutex));
