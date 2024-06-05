@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 17:16:29 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/05 17:28:07 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,10 +251,10 @@ static void	*routine(void *args)
 	break_flag = 0;
 	philo = ((t_args *)args)->philo;
 	rules = ((t_args *)args)->rules;
-	if (philo->id % 2 == 0)
-		usleep(40 * rules->nb_philo);
 	while (get_current_time(rules->tv_beg) < 0)
 		usleep(100);
+	if (philo->id % 2 == 0)
+		usleep(40 * rules->nb_philo);
 	if (run_routine(philo, rules, &break_flag))
 	{
 		pthread_mutex_lock(&(rules->global_mutex));
@@ -325,6 +325,7 @@ void	*monitor(void *args)
 	while (get_current_time(rules->tv_beg) < 0)
 		usleep(100);
 	pthread_mutex_lock(&(rules->global_mutex));
+	printf("Monitoring %d philos\n", rules->nb_philo);
 	while (rules->nb_eating > 0 || rules->nb_of_meals == -2)
 	{
 		if (rules->nb_of_meals == -2 || philos[i].meal < rules->nb_of_meals)

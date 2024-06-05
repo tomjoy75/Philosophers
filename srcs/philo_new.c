@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_new.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 00:30:20 by joyeux           ###   ########.fr       */
+/*   Updated: 2024/06/05 17:33:46 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@ int	init_philos(int nb_philo, t_philo *philos, t_rules *rules)
 		if (pthread_mutex_init(&(philos[i].l_fork), NULL))
 			return (clean_all(philos, i), 1);
 		philos[i].l_locked = 0;
-		if (gettimeofday(&(philos[i].last_eat), NULL))
-			return (clean_all(philos, nb_philo), 1);
+//		if (gettimeofday(&(philos[i].last_eat), NULL))
+//			return (clean_all(philos, nb_philo), 1);
+		philos[i].last_eat = rules->tv_beg;
 		philos[i].meal = 0;
 		philos[i].r_fork = &philos[(i + 1) % nb_philo].l_fork;
 		philos[i].r_locked = &philos[(i + 1) % nb_philo].l_locked;
