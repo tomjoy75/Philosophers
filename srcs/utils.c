@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:15:46 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/04 10:54:53 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/05 17:13:32 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,17 @@ int	time_passed(struct timeval tv_end, struct timeval tv_beg)
 	return (((tv_end.tv_sec - tv_beg.tv_sec) * 1000)
 			+ ((tv_end.tv_usec - tv_beg.tv_usec) / 1000));
 }
+
+int	get_current_time(struct timeval tv_beg)
+{
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL))
+		return (1);
+	return ((tv.tv_sec - tv_beg.tv_sec) * 1000	+ ((tv.tv_usec - tv_beg.tv_usec) / 1000));
+}
+
+
 
 void	mtx_printf_noarg(t_rules *rules, char *str)
 {

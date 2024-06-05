@@ -6,7 +6,7 @@
 /*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 15:36:08 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/05 17:16:29 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,6 +253,8 @@ static void	*routine(void *args)
 	rules = ((t_args *)args)->rules;
 	if (philo->id % 2 == 0)
 		usleep(40 * rules->nb_philo);
+	while (get_current_time(rules->tv_beg) < 0)
+		usleep(100);
 	if (run_routine(philo, rules, &break_flag))
 	{
 		pthread_mutex_lock(&(rules->global_mutex));
@@ -320,6 +322,8 @@ void	*monitor(void *args)
 	// 1 . Verifier si il a mange tous les repas(necessaire??)
 	// 2 . Verifier si il est mort
 	i = 0;
+	while (get_current_time(rules->tv_beg) < 0)
+		usleep(100);
 	pthread_mutex_lock(&(rules->global_mutex));
 	while (rules->nb_eating > 0 || rules->nb_of_meals == -2)
 	{

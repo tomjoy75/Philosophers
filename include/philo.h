@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/14 11:52:29 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/04 10:48:23 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/05 17:14:15 by tjoyeux          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ void	*error_exit_null(const char *error);
 int	parse_input(t_rules *rules, int argc, char **argv);
 void	clean_all(t_philo *philos, int n_mutex);
 int	time_passed(struct timeval tv_end, struct timeval tv_beg);
+int	get_current_time(struct timeval tv_beg);
 int	timestamp(t_philo *philo, t_rules *rules, int state);
 int	start_simulation(t_philo *philos, t_rules *rules);
 void	mtx_printf_noarg(t_rules *rules, char *str);
