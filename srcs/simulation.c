@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simulation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 13:02:10 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 17:28:07 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/06 00:36:24 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,16 +225,13 @@ int	run_routine(t_philo *philo, t_rules *rules, int *break_flag)
 			return (0);
 		if (!sleeping_time(philo, rules, break_flag))
 			return (1);
-		pthread_mutex_lock(&(rules->global_mutex));// TODO: Cela cree une boucle infinie...pourquoi ?
+		pthread_mutex_lock(&(rules->global_mutex));
 		if (*break_flag || rules->simulation_finished)
 			{
 				pthread_mutex_unlock(&(rules->global_mutex));
 				return (0);
 			}	
 		pthread_mutex_unlock(&(rules->global_mutex));
-//		if (!thinking_time(philo, rules))
-//			return (1);
-		
 		thinking_time(philo, rules);
 		pthread_mutex_lock(&(rules->global_mutex));
 	}
@@ -264,68 +261,18 @@ static void	*routine(void *args)
 	free(args);
 	return (NULL);
 }
-/*
-int	is_prior(t_philo *philo, t_rules *rules)
-{
-	
-}
-*/
-/*
-void	*dead(void *args)
-{
-	t_rules			*rules = (t_rules *)args;
-	t_philo			*philos = rules->philos;
-	int				frequence = 100;
-	int				time_passed;
-	struct timeval	tv_act;
 
-//	while (rules->nb_eating > 0)
-	while (philo->meal < rules->nb_of_meals || rules->nb_of_meals == -2) 
-	{
-		if (gettimeofday(&tv_act, NULL))
-			return (NULL);
-		time_passed = (((tv_act.tv_sec - philo->last_eat.tv_sec) * 1000)
-				+ ((tv_act.tv_usec - philo->last_eat.tv_usec) / 1000));
-		if (time_passed > rules->time_to_die)
-		{
-			// Died
-			timestamp(*philo, rules, 5);
-			rules->nb_of_meals = 0;
-		}
-		// TODO: Gestion de priorite
-		// Pour les philos impairs, assigner une priorite
-		// 1 . Condition
-		// 2 . Initialisation (last_eat_max & priority)
-		// 3 . Mettre dans les conditions de routine
-// 		else if (time_passed > rules->last_eat_max)
-// 		{
-// 			rules->last_eat_max = 
-// 			rules->priority = philo->id;
-// 		}
-		usleep (frequence);
-	}
-	return (NULL);
-}*/
-
-//TODO: Checker boucle infinie si pesonne ne meurt(tout le monde a mange)
 void	*monitor(void *args)
 {
 	t_rules			*rules = (t_rules *)args;
 	t_philo			*philos = rules->philos;
-	// int				frequence = 100;
-	// int				time_passed;
 	 struct timeval	tv_act;
 	 int				i;
 
-//	(void)args;
-	// Pour chaques philosophe :
-	// 1 . Verifier si il a mange tous les repas(necessaire??)
-	// 2 . Verifier si il est mort
 	i = 0;
 	while (get_current_time(rules->tv_beg) < 0)
 		usleep(100);
 	pthread_mutex_lock(&(rules->global_mutex));
-	printf("Monitoring %d philos\n", rules->nb_philo);
 	while (rules->nb_eating > 0 || rules->nb_of_meals == -2)
 	{
 		if (rules->nb_of_meals == -2 || philos[i].meal < rules->nb_of_meals)
@@ -334,7 +281,7 @@ void	*monitor(void *args)
 			if (gettimeofday(&tv_act, NULL))
 				return (NULL);
 			pthread_mutex_lock(&(rules->global_mutex));
-			if (time_passed(tv_act, philos[i].last_eat) >= rules->time_to_die)
+			if (time_passed(tv_act, philos[i].last_eat) > rules->time_to_die)
 			{
 				rules->simulation_finished++;
 				pthread_mutex_unlock(&(rules->global_mutex));
@@ -347,13 +294,10 @@ void	*monitor(void *args)
 		i++;
 		if (i == rules->nb_philo)
 			i = 0;
-//		usleep (200 / rules->nb_philo);
+		usleep (200 / rules->nb_philo);
 		pthread_mutex_lock(&(rules->global_mutex));
 	}
 	pthread_mutex_unlock(&(rules->global_mutex));
-//	printf ("Monitoring %d philos\n", rules->nb_philo);
-//	printf ("Monitoring philos %d\n", *philos->id);
-//	rules->monitor_thread_running = 0;
 	return (NULL);
 }
 
@@ -376,23 +320,13 @@ int	start_simulation(t_philo *philos, t_rules *rules)
 			return (free(args), 1);
 		i++;
 	}
-//	rules->monitor_thread_running = 1;	
 	if (pthread_create(&(rules->t_monitor), NULL, &monitor, (void *)rules))
 		return (1);
-//	mtx_printf_noarg(rules, "Monitor thread created");
 	if (pthread_join(rules->t_monitor, NULL))
 		return (1);
-//	mtx_printf_noarg(rules, "Joining Monitor thread\n"); 
 	i = -1;
 	while (++i < rules->nb_philo)
-	{
-//		mtx_printf_arg(rules, "Joining philosopher thread", i + 1);
 		if (pthread_join(philos[i].t_id, NULL))
-		{
-//			mtx_printf_arg(rules, "Failed to join philosopher thread", i + 1);
 			return (1);
-		}
-//		mtx_printf_arg(rules, "Philosopher thread joined", i + 1);
-	}
 	return (rules->error_flag);
 }

@@ -6,7 +6,7 @@
 #    By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/11 15:58:40 by tjoyeux           #+#    #+#              #
-#    Updated: 2024/06/04 01:48:26 by joyeux           ###   ########.fr        #
+#    Updated: 2024/06/05 23:56:36 by joyeux           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,9 @@ NAME 		= philo
 
 CC		= gcc
 CFLAGS		= -Wall -Werror -Wextra -g3 
+# For debugging
+# In Bash : sudo sysctl vm.mmap_rnd_bits=28
+#CFLAGS		= -fsanitize=thread -g -O0
 LDFLAGS		= -pthread
 RM		= rm -f
 

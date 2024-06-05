@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_new.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:49:00 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 17:33:46 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/06 00:31:35 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ int	init_philos(int nb_philo, t_philo *philos, t_rules *rules)
 		if (pthread_mutex_init(&(philos[i].l_fork), NULL))
 			return (clean_all(philos, i), 1);
 		philos[i].l_locked = 0;
-//		if (gettimeofday(&(philos[i].last_eat), NULL))
-//			return (clean_all(philos, nb_philo), 1);
+		if (gettimeofday(&(philos[i].last_eat), NULL))
+			return (clean_all(philos, nb_philo), 1);
 		philos[i].last_eat = rules->tv_beg;
 		philos[i].meal = 0;
 		philos[i].r_fork = &philos[(i + 1) % nb_philo].l_fork;
@@ -46,7 +46,6 @@ int	main(int argc, char **argv)
 	memset(&rules, 0, sizeof(t_rules));
 	if (parse_input(&rules, argc, argv))
 		return (1);
-//	printf("value of nb_philo in main after parse_input : %d\n", rules.nb_philo);
 	rules.philos = malloc(sizeof(t_philo) * rules.nb_philo);
 	if (!rules.philos)
 		return (1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tjoyeux <tjoyeux@student.42.fr>            +#+  +:+       +#+        */
+/*   By: joyeux <joyeux@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 09:58:11 by tjoyeux           #+#    #+#             */
-/*   Updated: 2024/06/05 17:01:53 by tjoyeux          ###   ########.fr       */
+/*   Updated: 2024/06/06 00:00:01 by joyeux           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,16 +90,10 @@ int	parse_input(t_rules *rules, int argc, char **argv)
 		return (1);
 	if (!rules->nb_philo)
 		return (error_exit("At least 1 philosopher\n"));
-//	rules->finished = 0;
-	gettimeofday(&(rules->tv_beg), NULL); //A proteger
+	if (gettimeofday(&(rules->tv_beg), NULL))
+		return (1);
 	rules->tv_beg.tv_sec++;
-//	rules->last_eat_max = 0;
-//	if (rules->nb_philo > 1)
-//		rules->priority = 2;
-//	printf("value of nb_philo in parse_input : %d\n", rules->nb_philo);
 	if (pthread_mutex_init(&rules->global_mutex, NULL))
 		return (1);
-	// if (pthread_mutex_init(&rules->eating_mutex, NULL))
-	// 	return (1);
 	return (0);
 }
